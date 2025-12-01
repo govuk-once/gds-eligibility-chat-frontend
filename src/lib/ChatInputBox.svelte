@@ -15,7 +15,6 @@
 		onSend(); // Call the prop directly
 	}
 
-
 	function handleKeyDown(e: KeyboardEvent) {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
@@ -40,9 +39,10 @@
 
 <style>
 	.chat-input-box {
+		position: relative; 
 		display: flex;
 		gap: 0.5rem;
-		align-items: flex-start;
+		align-items: center;
 		padding: 0.5rem;
 		border: 1px solid #ccc;
 		border-radius: 0.5rem;
@@ -50,11 +50,11 @@
 
 	.chat-input-box textarea {
 		flex: 1;
-		padding: 0.5rem;
+		padding: 0.5rem 3rem 0.5rem 0.5rem;
 		font-size: 1rem;
 		border: none;
 		border-radius: 0.25rem;
-		font-family: inherit; /* Inherit font from parent */
+		font-family: inherit;
 		resize: none;
 		field-sizing: content;
 		max-height: 200px;
@@ -66,6 +66,9 @@
 	}
 
 	.chat-input-box button {
+		position: absolute;
+		right: 0.5rem;
+		bottom: 0.5rem;
 		width: 35px;
 		height: 35px;
 		padding: 0;
@@ -78,7 +81,7 @@
 		border-radius: 50%;
 		background-color: black;
 		color: white; /* For potential icon */
-		flex-shrink: 0; /* Prevent the button from shrinking */
+		flex-shrink: 0;
 	}
 
 	.chat-input-box button:disabled {
