@@ -5,6 +5,22 @@
 	let input = $state('');
 	let loading = $state(false);
 	let chatInputBoxComponent: ChatInputBox;
+	let isMobileDevice = false; // New variable to track device type
+
+	// Effect to detect mobile device based on pointer capability
+	$effect(() => {
+		if (typeof window !== 'undefined') {
+			const mediaQuery = window.matchMedia('(pointer: coarse)');
+			isMobileDevice = mediaQuery.matches;
+
+			// Listen for changes (though unlikely to change during session)
+			const handleChange = (e: MediaQueryListEvent) => {
+				isMobileDevice = e.matches;
+			};
+			mediaQuery.addEventListener('change', handleChange);
+			return () => mediaQuery.removeEventListener('change', handleChange);
+		}
+	});
 
 	// Attachment to handle resizing when the virtual keyboard appears on mobile
 	function virtualViewportSizer(node: HTMLDivElement) {
@@ -68,7 +84,8 @@
 			});
 		} finally {
 			loading = false;
-			if (chatInputBoxComponent) {
+			// Only refocus if not on a mobile device
+			if (chatInputBoxComponent && !isMobileDevice) {
 				// Add small delay to ensure DOM has updated after `loading = false`
 				// and input is ready to receive focus.
 				setTimeout(() => {
