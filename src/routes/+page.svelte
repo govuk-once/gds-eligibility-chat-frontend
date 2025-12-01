@@ -4,6 +4,7 @@
 	let messages = $state<{ id: string; role: 'user' | 'assistant' | 'error'; text: string }[]>([]);
 	let input = $state('');
 	let loading = $state(false);
+	let chatInputBoxComponent: ChatInputBox;
 
 	// Attachment to handle resizing when the virtual keyboard appears on mobile
 	function virtualViewportSizer(node: HTMLDivElement) {
@@ -67,6 +68,13 @@
 			});
 		} finally {
 			loading = false;
+			if (chatInputBoxComponent) {
+				// Add small delay to ensure DOM has updated after `loading = false`
+				// and input is ready to receive focus.
+				setTimeout(() => {
+					chatInputBoxComponent.focusInput();
+				}, 0);
+			}
 		}
 	}
 </script>
@@ -85,6 +93,7 @@
 	</div>
 
 	<ChatInputBox
+		bind:this={chatInputBoxComponent}
 		bind:value={input}
 		{loading}
 		placeholder="What are you looking for?"

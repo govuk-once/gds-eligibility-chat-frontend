@@ -6,6 +6,11 @@
 		onSend = () => {} // Callback prop
 	} = $props();
 
+	let inputElement: HTMLInputElement;
+	export function focusInput() {
+		inputElement.focus();
+	}
+
 	function handleSend() {
 		onSend(); // Call the prop directly
 	}
@@ -22,6 +27,7 @@
 	<label for="chat-input-box-input" class="visually-hidden">Type a message</label>
 	<input
 		id="chat-input-box-input"
+		bind:this={inputElement}
 		bind:value
 		{placeholder}
 		onkeydown={handleKeyDown}
