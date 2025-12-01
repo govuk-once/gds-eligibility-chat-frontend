@@ -38,7 +38,9 @@ This project is configured to run in a Docker container using Docker Compose.
     ```bash
     docker-compose up -d
     ```
+
     or for a rebuild in detached mode:
+
     ```bash
     docker-compose up --build -d
     ```

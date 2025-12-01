@@ -39,7 +39,7 @@
 
 <style>
 	.chat-input-box {
-		position: relative; 
+		position: relative;
 		display: flex;
 		gap: 0.5rem;
 		align-items: center;

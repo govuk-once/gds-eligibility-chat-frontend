@@ -8,6 +8,6 @@ services:
     image: eligibility-chat
     container_name: eligibility-chat-container
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - PORT=3000
