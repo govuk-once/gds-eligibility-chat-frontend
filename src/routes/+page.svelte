@@ -4,6 +4,28 @@
 	let messages = $state<{ id: string; role: 'user' | 'assistant' | 'error'; text: string }[]>([]);
 	let input = $state('');
 	let loading = $state(false);
+	let chatContainer: HTMLDivElement;
+
+	// Effect to handle resizing when the virtual keyboard appears on mobile
+	$effect(() => {
+		if (typeof window === 'undefined' || !window.visualViewport) return;
+
+		const viewport = window.visualViewport;
+
+		const handleResize = () => {
+			if (chatContainer) {
+				chatContainer.style.height = `${viewport.height}px`;
+			}
+		};
+
+		handleResize();
+
+		viewport.addEventListener('resize', handleResize);
+
+		return () => {
+			viewport.removeEventListener('resize', handleResize);
+		};
+	});
 
 	function autoScroll(node: HTMLElement) {
 		$effect(() => {
@@ -51,7 +73,7 @@
 	}
 </script>
 
-<div class="chat-container">
+<div class="chat-container" bind:this={chatContainer}>
 	<div class="chat-window" {@attach autoScroll}>
 		{#each messages as m (m.id)}
 			<div class="message {m.role}">
@@ -91,12 +113,14 @@
 
 	.chat-container {
 		max-width: 800px;
-		width: 90vw;
-		margin: 2rem auto; /* top/bottom margin + auto horizontal centering */
+		width: 100%; /* Take full width to be centered by margin */
+		margin: 0 auto; /* Horizontal centering */
+		padding: 1rem; 
+		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-		height: calc(100svh - 4rem); /* Fill viewport height minus margins */
+		/* Height is now controlled by JavaScript */
 	}
 
 	.chat-window {
