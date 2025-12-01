@@ -1,4 +1,6 @@
 <script lang="ts">
+
+
 	let messages = $state<{ id: string; role: 'user' | 'assistant' | 'error'; text: string }[]>([]);
 	let input = $state('');
 	let loading = $state(false);
@@ -11,13 +13,15 @@
 		});
 	}
 
-	async function sendMessage(event: SubmitEvent) {
-		event.preventDefault();
-		if (!input.trim() || loading) return;
+	async function sendMessage() {
+		if (!input.trim() || loading) {
+			return;
+		}
 
-		messages.push({ id: crypto.randomUUID(), role: 'user', text: input });
 		const currentInput = input;
+		messages.push({ id: crypto.randomUUID(), role: 'user', text: currentInput });
 		input = '';
+
 		loading = true;
 
 		try {
@@ -28,17 +32,18 @@
 			});
 
 			if (!res.ok) {
-				throw new Error('API request failed');
+				throw new Error(`API request failed with status ${res.status}`);
 			}
 
-			const data = await res.json();
-			messages.push({ id: crypto.randomUUID(), role: 'assistant', text: data.reply });
+			const resData = await res.json();
+			messages.push({ id: crypto.randomUUID(), role: 'assistant', text: resData.reply });
 		} catch (error) {
-			console.log(error);
+			console.error('Fetch Error:', error);
+			const errorMessage = error instanceof Error ? error.message : String(error);
 			messages.push({
 				id: crypto.randomUUID(),
 				role: 'error',
-				text: 'Sorry, something went wrong. Please try again.'
+				text: `A network error occurred: ${errorMessage}`
 			});
 		} finally {
 			loading = false;
@@ -47,8 +52,6 @@
 </script>
 
 <div class="chat-container">
-	<h1>Chat</h1>
-
 	<div class="chat-window" {@attach autoScroll}>
 		{#each messages as m (m.id)}
 			<div class="message {m.role}">
@@ -62,11 +65,16 @@
 		{/if}
 	</div>
 
-	<form class="chat-input" onsubmit={sendMessage}>
+	<div class="chat-input">
 		<label for="chat-input" class="visually-hidden">Type a message</label>
-		<input id="chat-input" bind:value={input} placeholder="Type a message…" />
-		<button type="submit" disabled={loading}>Send</button>
-	</form>
+		<input
+			id="chat-input"
+			bind:value={input}
+			placeholder="What are you looking for?"
+			onkeydown={(e) => e.key === 'Enter' && sendMessage()}
+		/>
+		<button type="button" onclick={sendMessage} disabled={loading}>Send</button>
+	</div>
 </div>
 
 <style>
