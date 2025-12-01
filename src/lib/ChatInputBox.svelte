@@ -41,15 +41,22 @@
 		display: flex;
 		gap: 0.5rem;
 		align-items: center;
+		padding: 0.5rem;
+		border: 1px solid #ccc;
+		border-radius: 0.5rem;
 	}
 
 	.chat-input-box input {
 		flex: 1;
 		padding: 0.5rem;
 		font-size: 1rem;
-		border: 1px solid #ccc;
+		border: none;
 		border-radius: 0.25rem;
 		font-family: inherit; /* Inherit font from parent */
+	}
+
+	.chat-input-box input:focus {
+		outline: none;
 	}
 
 	.chat-input-box button {
