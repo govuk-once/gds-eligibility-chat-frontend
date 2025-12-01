@@ -55,7 +55,6 @@
 	<div class="chat-window" {@attach autoScroll}>
 		{#each messages as m (m.id)}
 			<div class="message {m.role}">
-				<strong>{m.role}:</strong>
 				{m.text}
 			</div>
 		{/each}
@@ -73,7 +72,7 @@
 			placeholder="What are you looking for?"
 			onkeydown={(e) => e.key === 'Enter' && sendMessage()}
 		/>
-		<button type="button" onclick={sendMessage} disabled={loading}>Send</button>
+		<button type="button" onclick={sendMessage} disabled={loading} aria-label="Send message"></button>
 	</div>
 </div>
 
@@ -110,27 +109,31 @@
 	}
 
 	.message {
-		padding: 0.5rem;
-		border-radius: 0.25rem;
+		/* Base styling for all messages, will be overridden for assistant/error */
+		overflow-wrap: break-word;
+		word-break: break-word; /* For older browser compatibility and stronger breaking */
 	}
 
 	.message.user {
-		text-align: right;
+		padding: 0.5rem; 
+		border-radius: 0.25rem;
+		text-align: left;
 		background-color: #f0f0f0;
-		align-self: flex-end;
+		align-self: flex-end; /* Chat bubble effect */
+		max-width: 80%; /* Optional: limit width for bubble effect */
 	}
 
-	.message.assistant {
+	.message.assistant,
+	.message.error {
+		padding: 0.5rem 0.5rem;
+		border-radius: 0;
+		background-color: transparent;
 		text-align: left;
-		background-color: #e0e0e0;
-		align-self: flex-start;
+		align-self: stretch;
 	}
 
 	.message.error {
-		text-align: left;
-		background-color: #fdd;
 		color: #c00;
-		align-self: stretch;
 	}
 
 	.chat-input {
@@ -147,12 +150,18 @@
 	}
 
 	.chat-input button {
-		padding: 0.5rem 1rem;
+		width: 40px;
+		height: 40px;
+		padding: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		font-size: 1rem;
 		cursor: pointer;
-		border: 1px solid #ccc;
-		border-radius: 0.25rem;
-		background-color: #f0f0f0;
+		border: none;
+		border-radius: 50%;
+		background-color: black;
+		color: white; /* For potential icon */
 	}
 
 	.chat-input button:disabled {
