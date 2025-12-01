@@ -7,7 +7,6 @@
 
 	// Attachment to handle resizing when the virtual keyboard appears on mobile
 	function virtualViewportSizer(node: HTMLDivElement) {
-		// Ensure this only runs on the client where window and visualViewport are available
 		if (typeof window === 'undefined' || !window.visualViewport) return;
 
 		const viewport = window.visualViewport;
@@ -16,10 +15,8 @@
 			node.style.height = `${viewport.height}px`;
 		};
 
-		// Set the initial size
 		handleResize();
 
-		// Add event listener for changes
 		viewport.addEventListener('resize', handleResize);
 
 		// Cleanup function to remove the listener when the component is destroyed
@@ -75,6 +72,7 @@
 </script>
 
 <div class="chat-container" {@attach virtualViewportSizer}>
+
 	<div class="chat-window" {@attach autoScroll}>
 		{#each messages as m (m.id)}
 			<div class="message {m.role}">
