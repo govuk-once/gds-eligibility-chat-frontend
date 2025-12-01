@@ -4,28 +4,29 @@
 	let messages = $state<{ id: string; role: 'user' | 'assistant' | 'error'; text: string }[]>([]);
 	let input = $state('');
 	let loading = $state(false);
-	let chatContainer: HTMLDivElement;
 
-	// Effect to handle resizing when the virtual keyboard appears on mobile
-	$effect(() => {
+	// Attachment to handle resizing when the virtual keyboard appears on mobile
+	function virtualViewportSizer(node: HTMLDivElement) {
+		// Ensure this only runs on the client where window and visualViewport are available
 		if (typeof window === 'undefined' || !window.visualViewport) return;
 
 		const viewport = window.visualViewport;
 
 		const handleResize = () => {
-			if (chatContainer) {
-				chatContainer.style.height = `${viewport.height}px`;
-			}
+			node.style.height = `${viewport.height}px`;
 		};
 
+		// Set the initial size
 		handleResize();
 
+		// Add event listener for changes
 		viewport.addEventListener('resize', handleResize);
 
+		// Cleanup function to remove the listener when the component is destroyed
 		return () => {
 			viewport.removeEventListener('resize', handleResize);
 		};
-	});
+	}
 
 	function autoScroll(node: HTMLElement) {
 		$effect(() => {
@@ -73,7 +74,7 @@
 	}
 </script>
 
-<div class="chat-container" bind:this={chatContainer}>
+<div class="chat-container" {@attach virtualViewportSizer}>
 	<div class="chat-window" {@attach autoScroll}>
 		{#each messages as m (m.id)}
 			<div class="message {m.role}">
