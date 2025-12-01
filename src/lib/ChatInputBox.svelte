@@ -6,7 +6,7 @@
 		onSend = () => {} // Callback prop
 	} = $props();
 
-	let inputElement: HTMLInputElement;
+	let inputElement: HTMLTextAreaElement;
 	export function focusInput() {
 		inputElement.focus();
 	}
@@ -15,9 +15,10 @@
 		onSend(); // Call the prop directly
 	}
 
+
 	function handleKeyDown(e: KeyboardEvent) {
-		if (e.key === 'Enter') {
-			e.preventDefault(); // Prevent form submission if it's in a form
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
 			handleSend();
 		}
 	}
@@ -25,14 +26,15 @@
 
 <div class="chat-input-box">
 	<label for="chat-input-box-input" class="visually-hidden">Type a message</label>
-	<input
+	<textarea
 		id="chat-input-box-input"
 		bind:this={inputElement}
 		bind:value
 		{placeholder}
 		onkeydown={handleKeyDown}
 		disabled={loading}
-	/>
+		rows="1"
+	></textarea>
 	<button type="button" onclick={handleSend} disabled={loading} aria-label="Send message"></button>
 </div>
 
@@ -40,28 +42,32 @@
 	.chat-input-box {
 		display: flex;
 		gap: 0.5rem;
-		align-items: center;
+		align-items: flex-start;
 		padding: 0.5rem;
 		border: 1px solid #ccc;
 		border-radius: 0.5rem;
 	}
 
-	.chat-input-box input {
+	.chat-input-box textarea {
 		flex: 1;
 		padding: 0.5rem;
 		font-size: 1rem;
 		border: none;
 		border-radius: 0.25rem;
 		font-family: inherit; /* Inherit font from parent */
+		resize: none;
+		field-sizing: content;
+		max-height: 200px;
+		overflow-y: auto;
 	}
 
-	.chat-input-box input:focus {
+	.chat-input-box textarea:focus {
 		outline: none;
 	}
 
 	.chat-input-box button {
-		width: 40px;
-		height: 40px;
+		width: 35px;
+		height: 35px;
 		padding: 0;
 		display: flex;
 		justify-content: center;
