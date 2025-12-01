@@ -96,16 +96,18 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+		height: calc(100svh - 4rem); /* Fill viewport height minus margins */
 	}
 
 	.chat-window {
 		border: 1px solid #ccc;
 		padding: 1rem;
-		height: 300px;
 		overflow-y: auto;
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+		flex: 1; /* Grow to fill available space */
+		min-height: 0; /* Prevent flexbox overflow */
 	}
 
 	.message {
