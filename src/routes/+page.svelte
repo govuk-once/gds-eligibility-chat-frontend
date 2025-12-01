@@ -2,16 +2,17 @@
 	let messages = $state<{ id: string; role: 'user' | 'assistant' | 'error'; text: string }[]>([]);
 	let input = $state('');
 	let loading = $state(false);
-	let chatWindow: HTMLDivElement;
 
-	// Auto-scroll to the bottom of the chat window when new messages are added
-	$effect(() => {
-		if (chatWindow && messages.length) {
-			chatWindow.scrollTop = chatWindow.scrollHeight;
-		}
-	});
+	function autoScroll(node: HTMLElement) {
+		$effect(() => {
+			if (messages.length) {
+				node.scrollTop = node.scrollHeight;
+			}
+		});
+	}
 
-	async function sendMessage() {
+	async function sendMessage(event: SubmitEvent) {
+		event.preventDefault();
 		if (!input.trim() || loading) return;
 
 		messages.push({ id: crypto.randomUUID(), role: 'user', text: input });
@@ -48,7 +49,7 @@
 <div class="chat-container">
 	<h1>Chat</h1>
 
-	<div class="chat-window" bind:this={chatWindow}>
+	<div class="chat-window" {@attach autoScroll}>
 		{#each messages as m (m.id)}
 			<div class="message {m.role}">
 				<strong>{m.role}:</strong>
@@ -61,7 +62,7 @@
 		{/if}
 	</div>
 
-	<form class="chat-input" on:submit|preventDefault={sendMessage}>
+	<form class="chat-input" onsubmit={sendMessage}>
 		<label for="chat-input" class="visually-hidden">Type a message</label>
 		<input id="chat-input" bind:value={input} placeholder="Type a message…" />
 		<button type="submit" disabled={loading}>Send</button>
