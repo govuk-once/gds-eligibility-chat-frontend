@@ -119,7 +119,8 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-		/* Height is now controlled by JavaScript */
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Consistent sans-serif font */
+		/* Height is controlled by JavaScript */
 	}
 
 	.chat-window {
