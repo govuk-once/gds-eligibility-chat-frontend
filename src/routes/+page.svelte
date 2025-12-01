@@ -1,5 +1,5 @@
 <script lang="ts">
-
+	import ChatInputBox from '$lib/ChatInputBox.svelte';
 
 	let messages = $state<{ id: string; role: 'user' | 'assistant' | 'error'; text: string }[]>([]);
 	let input = $state('');
@@ -72,7 +72,6 @@
 </script>
 
 <div class="chat-container" {@attach virtualViewportSizer}>
-
 	<div class="chat-window" {@attach autoScroll}>
 		{#each messages as m (m.id)}
 			<div class="message {m.role}">
@@ -85,16 +84,12 @@
 		{/if}
 	</div>
 
-	<div class="chat-input">
-		<label for="chat-input" class="visually-hidden">Type a message</label>
-		<input
-			id="chat-input"
-			bind:value={input}
-			placeholder="What are you looking for?"
-			onkeydown={(e) => e.key === 'Enter' && sendMessage()}
-		/>
-		<button type="button" onclick={sendMessage} disabled={loading} aria-label="Send message"></button>
-	</div>
+	<ChatInputBox
+		bind:value={input}
+		{loading}
+		placeholder="What are you looking for?"
+		onSend={sendMessage}
+	/>
 </div>
 
 <style>
@@ -114,12 +109,12 @@
 		max-width: 800px;
 		width: 100%; /* Take full width to be centered by margin */
 		margin: 0 auto; /* Horizontal centering */
-		padding: 1rem; 
+		padding: 1rem;
 		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Consistent sans-serif font */
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		/* Height is controlled by JavaScript */
 	}
 
@@ -141,7 +136,7 @@
 	}
 
 	.message.user {
-		padding: 0.5rem; 
+		padding: 0.5rem;
 		border-radius: 0.25rem;
 		text-align: left;
 		background-color: #f0f0f0;
@@ -160,38 +155,5 @@
 
 	.message.error {
 		color: #c00;
-	}
-
-	.chat-input {
-		display: flex;
-		gap: 0.5rem;
-	}
-
-	.chat-input input {
-		flex: 1;
-		padding: 0.5rem;
-		font-size: 1rem;
-		border: 1px solid #ccc;
-		border-radius: 0.25rem;
-	}
-
-	.chat-input button {
-		width: 40px;
-		height: 40px;
-		padding: 0;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		font-size: 1rem;
-		cursor: pointer;
-		border: none;
-		border-radius: 50%;
-		background-color: black;
-		color: white; /* For potential icon */
-	}
-
-	.chat-input button:disabled {
-		cursor: not-allowed;
-		opacity: 0.6;
 	}
 </style>
