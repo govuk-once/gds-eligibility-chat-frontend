@@ -6,6 +6,8 @@
 	let loading = $state(false);
 	let chatInputBoxComponent: ChatInputBox;
 	let isMobileDevice = false; // New variable to track device type
+	let executionId = $state<string | undefined>(undefined);
+	let nodeName = $state<string | undefined>(undefined);
 
 	// Effect to detect mobile device based on pointer capability
 	$effect(() => {
@@ -62,10 +64,19 @@
 		loading = true;
 
 		try {
+			const requestBody: { message: string; executionId?: string; nodeName?: string } = {
+				message: currentInput
+			};
+
+			if (executionId && nodeName) {
+				requestBody.executionId = executionId;
+				requestBody.nodeName = nodeName;
+			}
+
 			const res = await fetch('/api/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ message: currentInput })
+				body: JSON.stringify(requestBody)
 			});
 
 			if (!res.ok) {
@@ -73,7 +84,15 @@
 			}
 
 			const resData = await res.json();
-			messages.push({ id: crypto.randomUUID(), role: 'assistant', text: resData.reply });
+			messages.push({ id: crypto.randomUUID(), role: 'assistant', text: resData.content.document });
+
+			if (resData.completionReason === 'INPUT_REQUIRED') {
+				executionId = resData.executionId;
+				nodeName = resData.nodeName;
+			} else {
+				executionId = undefined;
+				nodeName = undefined;
+			}
 		} catch (error) {
 			console.error('Fetch Error:', error);
 			const errorMessage = error instanceof Error ? error.message : String(error);
@@ -105,7 +124,7 @@
 		{/each}
 
 		{#if loading}
-			<div class="message assistant"><strong>assistant:</strong> Thinking...</div>
+			<div class="message assistant">Thinking...</div>
 		{/if}
 	</div>
 

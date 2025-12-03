@@ -24,6 +24,7 @@ vite.config.ts.timestamp-*
 
 # AI tools
 .gemini
+GEMINI.md
 
 # Temporary folder
 tmp
