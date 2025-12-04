@@ -226,17 +226,18 @@
 	.message {
 		/* margin-top: 1.5em; */
 		/* Base styling for all messages, will be overridden for assistant/error */
+		font-size: 1em;
 		overflow-wrap: break-word;
 		word-break: break-word; /* For older browser compatibility and stronger breaking */
 	}
 
 	.message.user {
-		padding: 0.5rem;
-		border-radius: 0.25rem;
+		padding: 0.69em 1.5em;
+		border-radius: 10.86px;
 		text-align: left;
-		background-color: #f0f0f0;
+		background-color: #d9d9d9;
 		align-self: flex-end; /* Chat bubble effect */
-		max-width: 80%; /* Optional: limit width for bubble effect */
+		max-width: 75%; /* Optional: limit width for bubble effect */
 	}
 
 	.message.assistant,
