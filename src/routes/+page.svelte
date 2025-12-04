@@ -185,6 +185,8 @@
 		max-width: 800px;
 		width: 100%;
 		margin: 0 auto; /* Horizontal centering */
+		padding: 0 2em; /* Add 2em "margins" on each side visually */
+		box-sizing: border-box; /* Include padding in the width calculation */
 		display: flex;
 		flex-direction: column;
 	}
