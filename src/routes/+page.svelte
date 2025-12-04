@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Header from '$lib/Header.svelte';
 	import ChatInputBox from '$lib/ChatInputBox.svelte';
 	import showdown from 'showdown';
 	import DOMPurify from 'dompurify';
@@ -14,9 +15,10 @@
 	let input = $state('');
 	let loading = $state(false);
 	let chatInputBoxComponent: ChatInputBox;
-	let isMobileDevice = false;
+	let isMobileDevice = $state(false);
 	let executionId = $state<string | undefined>(undefined);
 	let nodeName = $state<string | undefined>(undefined);
+	let isKeyboardCollapsed = $state(true);
 
 	const converter = new showdown.Converter();
 
@@ -48,6 +50,9 @@
 
 		const handleResize = () => {
 			node.style.height = `${viewport.height}px`;
+
+			const keyboardThreshold = 150;
+			isKeyboardCollapsed = !(window.innerHeight - viewport.height > keyboardThreshold);
 		};
 
 		handleResize();
@@ -135,35 +140,48 @@
 	}
 </script>
 
-<div class="chat-container" {@attach virtualViewportSizer}>
-	<div class="chat-window" {@attach autoScroll}>
-		{#each messages as m (m.id)}
-			<div class="message {m.role}">
-				{#if m.html}
-					<!-- we have sanitised m.html with DOMPurify -->
-					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-					{@html m.html}
-				{:else}
-					{m.text}
-				{/if}
-			</div>
-		{/each}
+<div class="page-container" {@attach virtualViewportSizer}>
+	<Header />
+	<div class="chat-container">
+		<div class="chat-window" {@attach autoScroll}>
+			{#each messages as m (m.id)}
+				<div class="message {m.role}">
+					{#if m.html}
+						<!-- we have sanitised m.html with DOMPurify -->
+						<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+						{@html m.html}
+					{:else}
+						{m.text}
+					{/if}
+				</div>
+			{/each}
 
-		{#if loading}
-			<div class="message assistant">Thinking...</div>
-		{/if}
+			{#if loading}
+				<div class="message assistant">Thinking...</div>
+			{/if}
+		</div>
+
+		<ChatInputBox
+			bind:this={chatInputBoxComponent}
+			bind:value={input}
+			{loading}
+			placeholder="What are you looking for?"
+			onSend={sendMessage}
+		/>
 	</div>
-
-	<ChatInputBox
-		bind:this={chatInputBoxComponent}
-		bind:value={input}
-		{loading}
-		placeholder="What are you looking for?"
-		onSend={sendMessage}
-	/>
+	{#if isMobileDevice && isKeyboardCollapsed}
+		<footer class="keyboard-collapsed-footer"></footer>
+	{/if}
 </div>
 
 <style>
+	.page-container {
+		max-width: 800px;
+		width: 100%;
+		margin: 0 auto; /* Horizontal centering */
+		display: flex;
+		flex-direction: column;
+	}
 	/* A visually hidden class for accessible labels */
 	.visually-hidden {
 		position: absolute;
@@ -177,20 +195,17 @@
 	}
 
 	.chat-container {
-		max-width: 800px;
 		width: 100%;
-		margin: 0 auto; /* Horizontal centering */
-		padding: 1rem;
 		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
 		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-		/* Height is controlled by JavaScript */
+		flex: 1;
+		min-height: 0;
 	}
 
 	.chat-window {
-		padding: 1rem;
 		overflow-y: auto;
 		display: flex;
 		flex-direction: column;
@@ -216,7 +231,7 @@
 
 	.message.assistant,
 	.message.error {
-		padding: 0.5rem 0.5rem;
+		padding: 0;
 		border-radius: 0;
 		background-color: transparent;
 		text-align: left;
@@ -225,5 +240,12 @@
 
 	.message.error {
 		color: #c00;
+	}
+
+	.keyboard-collapsed-footer {
+		height: 1em;
+		background-color: blue;
+		text-align: center;
+		flex-shrink: 0;
 	}
 </style>
