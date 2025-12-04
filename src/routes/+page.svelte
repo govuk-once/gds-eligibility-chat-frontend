@@ -1,13 +1,30 @@
 <script lang="ts">
 	import ChatInputBox from '$lib/ChatInputBox.svelte';
+	import showdown from 'showdown';
+	import DOMPurify from 'dompurify';
 
-	let messages = $state<{ id: string; role: 'user' | 'assistant' | 'error'; text: string }[]>([]);
+	type Message = {
+		id: string;
+		role: 'user' | 'assistant' | 'error';
+		text?: string;
+		html?: string;
+	};
+
+	let messages = $state<Message[]>([]);
 	let input = $state('');
 	let loading = $state(false);
 	let chatInputBoxComponent: ChatInputBox;
-	let isMobileDevice = false; // New variable to track device type
+	let isMobileDevice = false;
 	let executionId = $state<string | undefined>(undefined);
 	let nodeName = $state<string | undefined>(undefined);
+
+	const converter = new showdown.Converter();
+
+	messages.push({
+		id: crypto.randomUUID(),
+		role: 'assistant',
+		html: '<b>Hi!</b> How can I help you today?'
+	});
 
 	// Effect to detect mobile device based on pointer capability
 	$effect(() => {
@@ -15,7 +32,6 @@
 			const mediaQuery = window.matchMedia('(pointer: coarse)');
 			isMobileDevice = mediaQuery.matches;
 
-			// Listen for changes (though unlikely to change during session)
 			const handleChange = (e: MediaQueryListEvent) => {
 				isMobileDevice = e.matches;
 			};
@@ -84,7 +100,11 @@
 			}
 
 			const resData = await res.json();
-			messages.push({ id: crypto.randomUUID(), role: 'assistant', text: resData.content.document });
+			const markdown = resData.content.document;
+			const unsafeHtml = converter.makeHtml(markdown);
+			const safeHtml = DOMPurify.sanitize(unsafeHtml);
+
+			messages.push({ id: crypto.randomUUID(), role: 'assistant', html: safeHtml });
 
 			if (resData.completionReason === 'INPUT_REQUIRED') {
 				executionId = resData.executionId;
@@ -119,7 +139,13 @@
 	<div class="chat-window" {@attach autoScroll}>
 		{#each messages as m (m.id)}
 			<div class="message {m.role}">
-				{m.text}
+				{#if m.html}
+					<!-- we have sanitised m.html with DOMPurify -->
+					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+					{@html m.html}
+				{:else}
+					{m.text}
+				{/if}
 			</div>
 		{/each}
 
@@ -152,7 +178,7 @@
 
 	.chat-container {
 		max-width: 800px;
-		width: 100%; /* Take full width to be centered by margin */
+		width: 100%;
 		margin: 0 auto; /* Horizontal centering */
 		padding: 1rem;
 		box-sizing: border-box;
@@ -164,7 +190,6 @@
 	}
 
 	.chat-window {
-		border: 1px solid #ccc;
 		padding: 1rem;
 		overflow-y: auto;
 		display: flex;

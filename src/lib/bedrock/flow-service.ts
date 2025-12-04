@@ -11,6 +11,7 @@ import {
 import { logger } from '../utils/logger.js';
 import { bedrockClient } from './bedrock-client.js';
 import { checkAgentRationaleTracePart, getInputsObject } from './helpers.js';
+import { BEDROCK_FLOW_ID, BEDROCK_FLOW_ALIAS_ID } from '$env/static/private';
 
 export type FlowResponseObject = {
 	nodeName: string | undefined;
@@ -27,16 +28,16 @@ export const invokeFlow = async (
 ): Promise<FlowResponseObject> => {
 	const inputs: FlowInput[] = [getInputsObject(nodeName, message)];
 
+	logger.info({ BEDROCK_FLOW_ID, BEDROCK_FLOW_ALIAS_ID }, 'Bedrock flow IDs');
+
 	const commandInput: InvokeFlowCommandInput = {
-		flowIdentifier: process.env.BEDROCK_FLOW_ID!,
-		flowAliasIdentifier: process.env.BEDROCK_FLOW_ALIAS_ID!,
+		flowIdentifier: BEDROCK_FLOW_ID,
+		flowAliasIdentifier: BEDROCK_FLOW_ALIAS_ID,
 		inputs,
 		enableTrace: true,
 		executionId: inputExecutionId
 	};
 
-	const nodeenv = process.env.NODE_ENV;
-	logger.info({ nodeenv }, 'NODE ENV');
 	logger.info({ inputExecutionId, inputs }, 'Invoking Bedrock flow');
 
 	const command = new InvokeFlowCommand(commandInput);
