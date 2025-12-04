@@ -175,6 +175,12 @@
 </div>
 
 <style>
+	:global(.message p) {
+		margin: 0;
+	}
+	:global(.message.assistant p + p) {
+		margin-top: 1.5em;
+	}
 	.page-container {
 		max-width: 800px;
 		width: 100%;
@@ -206,15 +212,17 @@
 	}
 
 	.chat-window {
+		margin-top: 1.5em;
 		overflow-y: auto;
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		gap: 1.5em;
 		flex: 1; /* Grow to fill available space */
 		min-height: 0; /* Prevent flexbox overflow */
 	}
 
 	.message {
+		/* margin-top: 1.5em; */
 		/* Base styling for all messages, will be overridden for assistant/error */
 		overflow-wrap: break-word;
 		word-break: break-word; /* For older browser compatibility and stronger breaking */
