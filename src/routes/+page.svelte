@@ -165,7 +165,7 @@
 			bind:this={chatInputBoxComponent}
 			bind:value={input}
 			{loading}
-			placeholder="What are you looking for?"
+			placeholder="Ask me anything"
 			onSend={sendMessage}
 		/>
 	</div>

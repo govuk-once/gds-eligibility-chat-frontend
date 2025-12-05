@@ -43,34 +43,36 @@
 		display: flex;
 		gap: 0.5rem;
 		align-items: center;
-		padding: 0.5rem;
-		border: 1px solid #ccc;
-		border-radius: 0.5rem;
+		min-height: 2.75em;
+		padding: 0 2.75em 0 1.5em;
+		border: 1px solid #aaaaaa;
+		border-radius: 22px;
 	}
 
 	.chat-input-box textarea {
 		flex: 1;
-		padding: 0.5rem 3rem 0.5rem 0.5rem;
+		padding: 0;
 		font-size: 1rem;
 		border: none;
 		border-radius: 0.25rem;
 		font-family: inherit;
 		resize: none;
 		field-sizing: content;
-		max-height: 200px;
+		max-height: 4em;
 		overflow-y: auto;
 	}
 
 	.chat-input-box textarea:focus {
 		outline: none;
+		padding: 0;
 	}
 
 	.chat-input-box button {
 		position: absolute;
 		right: 0.5rem;
-		bottom: 0.5rem;
-		width: 35px;
-		height: 35px;
+		bottom: 0.375rem;
+		width: 2em;
+		height: 2em;
 		padding: 0;
 		display: flex;
 		justify-content: center;
