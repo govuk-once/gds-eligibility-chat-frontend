@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Header from '$lib/Header.svelte';
+	import Footer from '$lib/Footer.svelte';
 	import ChatInputBox from '$lib/ChatInputBox.svelte';
 	import showdown from 'showdown';
 	import DOMPurify from 'dompurify';
@@ -169,6 +170,9 @@
 			onSend={sendMessage}
 		/>
 	</div>
+	{#if !isMobileDevice}
+		<Footer />
+	{/if}
 	{#if isMobileDevice && isKeyboardCollapsed}
 		<footer class="keyboard-collapsed-footer"></footer>
 	{/if}
@@ -255,7 +259,6 @@
 
 	.keyboard-collapsed-footer {
 		height: 1em;
-		background-color: blue;
 		text-align: center;
 		flex-shrink: 0;
 	}

@@ -1,7 +1,7 @@
-<header></header>
+<footer></footer>
 
 <style>
-	header {
+	footer {
 		height: 6.625em;
 	}
 </style>
