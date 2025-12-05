@@ -23,21 +23,29 @@
 	}
 </script>
 
-<div class="chat-input-box">
-	<label for="chat-input-box-input" class="visually-hidden">Type a message</label>
-	<textarea
-		id="chat-input-box-input"
-		bind:this={inputElement}
-		bind:value
-		{placeholder}
-		onkeydown={handleKeyDown}
-		disabled={loading}
-		rows="1"
-	></textarea>
-	<button type="button" onclick={handleSend} disabled={loading} aria-label="Send message"></button>
+<div class="chat-input-wrapper">
+	<div class="chat-input-box">
+		<label for="chat-input-box-input" class="visually-hidden">Type a message</label>
+		<textarea
+			id="chat-input-box-input"
+			bind:this={inputElement}
+			bind:value
+			{placeholder}
+			onkeydown={handleKeyDown}
+			disabled={loading}
+			rows="1"
+		></textarea>
+		<button type="button" onclick={handleSend} disabled={loading} aria-label="Send message"
+		></button>
+	</div>
 </div>
 
 <style>
+	.chat-input-wrapper {
+		margin-top: 1.5em;
+		margin-bottom: 1.5em;
+	}
+
 	.chat-input-box {
 		position: relative;
 		display: flex;
