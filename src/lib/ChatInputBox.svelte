@@ -59,7 +59,7 @@
 
 	.chat-input-box textarea {
 		flex: 1;
-		padding: 0;
+		padding: 0.75em 0;
 		font-size: 1rem;
 		border: none;
 		border-radius: 0.25rem;
@@ -72,7 +72,7 @@
 
 	.chat-input-box textarea:focus {
 		outline: none;
-		padding: 0;
+		padding: 0.75em 0;
 	}
 
 	.chat-input-box button {
