@@ -60,6 +60,7 @@
 	.chat-input-box textarea {
 		flex: 1;
 		padding: 0.75em 0;
+		margin-right: 0.75em;
 		font-size: 1rem;
 		border: none;
 		border-radius: 0.25rem;
