@@ -59,21 +59,23 @@
 
 	.chat-input-box textarea {
 		flex: 1;
-		padding: 0.75em 0;
+		padding: 0;
 		margin-right: 0.75em;
 		font-size: 1rem;
 		border: none;
+		border-top: 0.75em solid transparent;
+		border-bottom: 0.75em solid transparent;
 		border-radius: 0.25rem;
 		font-family: inherit;
 		resize: none;
 		field-sizing: content;
 		max-height: 4em;
 		overflow-y: auto;
+		background-clip: padding-box;
 	}
 
 	.chat-input-box textarea:focus {
 		outline: none;
-		padding: 0.75em 0;
 	}
 
 	.chat-input-box button {
