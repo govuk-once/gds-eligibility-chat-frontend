@@ -23,42 +23,55 @@
 	}
 </script>
 
-<div class="chat-input-box">
-	<label for="chat-input-box-input" class="visually-hidden">Type a message</label>
-	<textarea
-		id="chat-input-box-input"
-		bind:this={inputElement}
-		bind:value
-		{placeholder}
-		onkeydown={handleKeyDown}
-		disabled={loading}
-		rows="1"
-	></textarea>
-	<button type="button" onclick={handleSend} disabled={loading} aria-label="Send message"></button>
+<div class="chat-input-wrapper">
+	<div class="chat-input-box">
+		<label for="chat-input-box-input" class="visually-hidden">Type a message</label>
+		<textarea
+			id="chat-input-box-input"
+			bind:this={inputElement}
+			bind:value
+			{placeholder}
+			onkeydown={handleKeyDown}
+			disabled={loading}
+			rows="1"
+		></textarea>
+		<button type="button" onclick={handleSend} disabled={loading} aria-label="Send message"
+		></button>
+	</div>
 </div>
 
 <style>
+	.chat-input-wrapper {
+		margin-top: 1.5em;
+		margin-bottom: 1.5em;
+	}
+
 	.chat-input-box {
 		position: relative;
 		display: flex;
 		gap: 0.5rem;
 		align-items: center;
-		padding: 0.5rem;
-		border: 1px solid #ccc;
-		border-radius: 0.5rem;
+		min-height: 2.75em;
+		padding: 0 2.75em 0 1.5em;
+		border: 1px solid #aaaaaa;
+		border-radius: 22px;
 	}
 
 	.chat-input-box textarea {
 		flex: 1;
-		padding: 0.5rem 3rem 0.5rem 0.5rem;
+		padding: 0;
+		margin-right: 0.75em;
 		font-size: 1rem;
 		border: none;
+		border-top: 0.75em solid transparent;
+		border-bottom: 0.75em solid transparent;
 		border-radius: 0.25rem;
 		font-family: inherit;
 		resize: none;
 		field-sizing: content;
-		max-height: 200px;
+		max-height: 4em;
 		overflow-y: auto;
+		background-clip: padding-box;
 	}
 
 	.chat-input-box textarea:focus {
@@ -68,9 +81,9 @@
 	.chat-input-box button {
 		position: absolute;
 		right: 0.5rem;
-		bottom: 0.5rem;
-		width: 35px;
-		height: 35px;
+		bottom: 0.375rem;
+		width: 2em;
+		height: 2em;
 		padding: 0;
 		display: flex;
 		justify-content: center;

@@ -1,11 +1,33 @@
 <script lang="ts">
+	import Header from '$lib/Header.svelte';
+	import Footer from '$lib/Footer.svelte';
 	import ChatInputBox from '$lib/ChatInputBox.svelte';
+	import showdown from 'showdown';
+	import DOMPurify from 'dompurify';
 
-	let messages = $state<{ id: string; role: 'user' | 'assistant' | 'error'; text: string }[]>([]);
+	type Message = {
+		id: string;
+		role: 'user' | 'assistant' | 'error';
+		text?: string;
+		html?: string;
+	};
+
+	let messages = $state<Message[]>([]);
 	let input = $state('');
 	let loading = $state(false);
 	let chatInputBoxComponent: ChatInputBox;
-	let isMobileDevice = false; // New variable to track device type
+	let isMobileDevice = $state(false);
+	let executionId = $state<string | undefined>(undefined);
+	let nodeName = $state<string | undefined>(undefined);
+	let isKeyboardCollapsed = $state(true);
+
+	const converter = new showdown.Converter();
+
+	messages.push({
+		id: crypto.randomUUID(),
+		role: 'assistant',
+		html: '<b>Hi!</b> How can I help you today?'
+	});
 
 	// Effect to detect mobile device based on pointer capability
 	$effect(() => {
@@ -13,7 +35,6 @@
 			const mediaQuery = window.matchMedia('(pointer: coarse)');
 			isMobileDevice = mediaQuery.matches;
 
-			// Listen for changes (though unlikely to change during session)
 			const handleChange = (e: MediaQueryListEvent) => {
 				isMobileDevice = e.matches;
 			};
@@ -30,6 +51,9 @@
 
 		const handleResize = () => {
 			node.style.height = `${viewport.height}px`;
+
+			const keyboardThreshold = 150;
+			isKeyboardCollapsed = !(window.innerHeight - viewport.height > keyboardThreshold);
 		};
 
 		handleResize();
@@ -62,10 +86,19 @@
 		loading = true;
 
 		try {
+			const requestBody: { message: string; executionId?: string; nodeName?: string } = {
+				message: currentInput
+			};
+
+			if (executionId && nodeName) {
+				requestBody.executionId = executionId;
+				requestBody.nodeName = nodeName;
+			}
+
 			const res = await fetch('/api/chat', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ message: currentInput })
+				body: JSON.stringify(requestBody)
 			});
 
 			if (!res.ok) {
@@ -73,7 +106,19 @@
 			}
 
 			const resData = await res.json();
-			messages.push({ id: crypto.randomUUID(), role: 'assistant', text: resData.reply });
+			const markdown = resData.content.document;
+			const unsafeHtml = converter.makeHtml(markdown);
+			const safeHtml = DOMPurify.sanitize(unsafeHtml);
+
+			messages.push({ id: crypto.randomUUID(), role: 'assistant', html: safeHtml });
+
+			if (resData.completionReason === 'INPUT_REQUIRED') {
+				executionId = resData.executionId;
+				nodeName = resData.nodeName;
+			} else {
+				executionId = undefined;
+				nodeName = undefined;
+			}
 		} catch (error) {
 			console.error('Fetch Error:', error);
 			const errorMessage = error instanceof Error ? error.message : String(error);
@@ -96,29 +141,59 @@
 	}
 </script>
 
-<div class="chat-container" {@attach virtualViewportSizer}>
-	<div class="chat-window" {@attach autoScroll}>
-		{#each messages as m (m.id)}
-			<div class="message {m.role}">
-				{m.text}
-			</div>
-		{/each}
+<div class="page-container" {@attach virtualViewportSizer}>
+	<Header />
+	<div class="chat-container">
+		<div class="chat-window" {@attach autoScroll}>
+			{#each messages as m (m.id)}
+				<div class="message {m.role}">
+					{#if m.html}
+						<!-- we have sanitised m.html with DOMPurify -->
+						<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+						{@html m.html}
+					{:else}
+						{m.text}
+					{/if}
+				</div>
+			{/each}
 
-		{#if loading}
-			<div class="message assistant"><strong>assistant:</strong> Thinking...</div>
-		{/if}
+			{#if loading}
+				<div class="message assistant">Thinking...</div>
+			{/if}
+		</div>
+
+		<ChatInputBox
+			bind:this={chatInputBoxComponent}
+			bind:value={input}
+			{loading}
+			placeholder="Ask me anything"
+			onSend={sendMessage}
+		/>
 	</div>
-
-	<ChatInputBox
-		bind:this={chatInputBoxComponent}
-		bind:value={input}
-		{loading}
-		placeholder="What are you looking for?"
-		onSend={sendMessage}
-	/>
+	{#if !isMobileDevice}
+		<Footer />
+	{/if}
+	{#if isMobileDevice && isKeyboardCollapsed}
+		<footer class="keyboard-collapsed-footer"></footer>
+	{/if}
 </div>
 
 <style>
+	:global(.message p) {
+		margin: 0;
+	}
+	:global(.message.assistant p + p) {
+		margin-top: 1.5em;
+	}
+	.page-container {
+		max-width: 800px;
+		width: 100%;
+		margin: 0 auto; /* Horizontal centering */
+		padding: 0 2em; /* Add 2em "margins" on each side visually */
+		box-sizing: border-box; /* Include padding in the width calculation */
+		display: flex;
+		flex-direction: column;
+	}
 	/* A visually hidden class for accessible labels */
 	.visually-hidden {
 		position: absolute;
@@ -132,47 +207,46 @@
 	}
 
 	.chat-container {
-		max-width: 800px;
-		width: 100%; /* Take full width to be centered by margin */
-		margin: 0 auto; /* Horizontal centering */
-		padding: 1rem;
+		width: 100%;
 		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
 		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-		/* Height is controlled by JavaScript */
+		flex: 1;
+		min-height: 0;
 	}
 
 	.chat-window {
-		border: 1px solid #ccc;
-		padding: 1rem;
+		margin-top: 1.5em;
 		overflow-y: auto;
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		gap: 1.5em;
 		flex: 1; /* Grow to fill available space */
 		min-height: 0; /* Prevent flexbox overflow */
 	}
 
 	.message {
+		/* margin-top: 1.5em; */
 		/* Base styling for all messages, will be overridden for assistant/error */
+		font-size: 1em;
 		overflow-wrap: break-word;
 		word-break: break-word; /* For older browser compatibility and stronger breaking */
 	}
 
 	.message.user {
-		padding: 0.5rem;
-		border-radius: 0.25rem;
+		padding: 0.69em 1.5em;
+		border-radius: 10.86px;
 		text-align: left;
-		background-color: #f0f0f0;
+		background-color: #d9d9d9;
 		align-self: flex-end; /* Chat bubble effect */
-		max-width: 80%; /* Optional: limit width for bubble effect */
+		max-width: 75%; /* Optional: limit width for bubble effect */
 	}
 
 	.message.assistant,
 	.message.error {
-		padding: 0.5rem 0.5rem;
+		padding: 0;
 		border-radius: 0;
 		background-color: transparent;
 		text-align: left;
@@ -181,5 +255,11 @@
 
 	.message.error {
 		color: #c00;
+	}
+
+	.keyboard-collapsed-footer {
+		height: 1em;
+		text-align: center;
+		flex-shrink: 0;
 	}
 </style>
