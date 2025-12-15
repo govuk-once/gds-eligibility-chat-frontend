@@ -3,25 +3,11 @@
 	import Footer from '$lib/Footer.svelte';
 	import ChatInputBox from '$lib/ChatInputBox.svelte';
 	import ChatMessage from '$lib/ChatMessage.svelte';
-	import showdown from 'showdown';
-	import DOMPurify from 'dompurify';
-	import type { Message } from '$lib/types';
+	import { chatState, sendMessage } from '$lib/chat.svelte';
 
-	let messages = $state<Message[]>([
-		{
-			id: crypto.randomUUID(),
-			role: 'assistant',
-			html: '<b>Hi!</b> How can I help you today?'
-		}
-	]);
-	let input = $state('');
-	let loading = $state(false);
 	let chatInputBoxComponent: ChatInputBox;
 	let isMobileDevice = $state(false);
-	let sessionId = $state<string | undefined>(undefined);
 	let isKeyboardCollapsed = $state(true);
-
-	const converter = new showdown.Converter();
 
 	// Effect to detect mobile device based on pointer capability
 	$effect(() => {
@@ -62,99 +48,18 @@
 
 	function autoScroll(node: HTMLElement) {
 		$effect(() => {
-			if (messages.length) {
+			if (chatState.messages.length) {
 				node.scrollTop = node.scrollHeight;
 			}
 		});
 	}
-
-	async function sendMessage() {
-		if (!input.trim() || loading) {
-			return;
-		}
-
-		const currentInput = input;
-		messages.push({ id: crypto.randomUUID(), role: 'user', text: currentInput });
-		input = '';
-		loading = true;
-
-		// Use a placeholder for the assistant's message, which we'll update
-		const assistantMessageId = crypto.randomUUID();
-		messages.push({ id: assistantMessageId, role: 'assistant', html: '' });
-
-		const isFirstMessage = !sessionId;
-		let currentSessionId = sessionId;
-		if (isFirstMessage) {
-			currentSessionId = crypto.randomUUID();
-			sessionId = currentSessionId;
-		}
-
-		try {
-			const res = await fetch('/api/chat', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					message: currentInput,
-					sessionId: currentSessionId,
-					is_first_message: isFirstMessage
-				})
-			});
-
-			if (!res.ok) {
-				const errorText = await res.text();
-				throw new Error(`API request failed with status ${res.status}: ${errorText}`);
-			}
-
-			const resData = await res.json();
-			let fullResponseMarkdown = '';
-
-			if (Array.isArray(resData)) {
-				for (const event of resData) {
-					// Check for model responses that contain text parts
-					if (
-						event.content?.role === 'model' &&
-						event.content.parts &&
-						Array.isArray(event.content.parts)
-					) {
-						for (const part of event.content.parts) {
-							if (part.text) {
-								fullResponseMarkdown += part.text;
-							}
-						}
-					}
-				}
-			}
-
-			const unsafeHtml = converter.makeHtml(fullResponseMarkdown);
-			const safeHtml = DOMPurify.sanitize(unsafeHtml);
-
-			const assistantMessage = messages.find((m) => m.id === assistantMessageId);
-			if (assistantMessage) {
-				if (safeHtml) {
-					assistantMessage.html = safeHtml;
-				} else {
-					assistantMessage.html = 'Received a non-text response from the agent.';
-				}
-			}
-		} catch (error) {
-			console.error('Fetch Error:', error);
-			const errorMessage = error instanceof Error ? error.message : String(error);
-
-			// Remove the placeholder message on error
-			messages = messages.filter((m) => m.id !== assistantMessageId);
-
-			messages.push({
-				id: crypto.randomUUID(),
-				role: 'error',
-				text: `A network error occurred: ${errorMessage}`
-			});
-		} finally {
-			loading = false;
-			if (chatInputBoxComponent && !isMobileDevice) {
-				setTimeout(() => {
-					chatInputBoxComponent.focusInput();
-				}, 0);
-			}
+	
+	async function handleSend() {
+		await sendMessage();
+		if (chatInputBoxComponent && !isMobileDevice) {
+			setTimeout(() => {
+				chatInputBoxComponent.focusInput();
+			}, 0);
 		}
 	}
 </script>
@@ -163,21 +68,21 @@
 	<Header />
 	<div class="chat-container">
 		<div class="chat-window" {@attach autoScroll}>
-			{#each messages as m (m.id)}
+			{#each chatState.messages as m (m.id)}
 				<ChatMessage message={m} />
 			{/each}
 
-			{#if loading}
+			{#if chatState.loading}
 				<ChatMessage message={{ id: 'loading-indicator', role: 'assistant', text: 'Thinking...' }} />
 			{/if}
 		</div>
 
 		<ChatInputBox
 			bind:this={chatInputBoxComponent}
-			bind:value={input}
-			{loading}
+			bind:value={chatState.input}
+			loading={chatState.loading}
 			placeholder="Ask me anything"
-			onSend={sendMessage}
+			onSend={handleSend}
 		/>
 	</div>
 	{#if !isMobileDevice}
