@@ -2,15 +2,10 @@
 	import Header from '$lib/Header.svelte';
 	import Footer from '$lib/Footer.svelte';
 	import ChatInputBox from '$lib/ChatInputBox.svelte';
+	import ChatMessage from '$lib/ChatMessage.svelte';
 	import showdown from 'showdown';
 	import DOMPurify from 'dompurify';
-
-	type Message = {
-		id: string;
-		role: 'user' | 'assistant' | 'error';
-		text?: string;
-		html?: string;
-	};
+	import type { Message } from '$lib/types';
 
 	let messages = $state<Message[]>([
 		{
@@ -169,19 +164,11 @@
 	<div class="chat-container">
 		<div class="chat-window" {@attach autoScroll}>
 			{#each messages as m (m.id)}
-				<div class="message {m.role}">
-					{#if m.html}
-						<!-- we have sanitised m.html with DOMPurify -->
-						<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-						{@html m.html}
-					{:else}
-						{m.text}
-					{/if}
-				</div>
+				<ChatMessage message={m} />
 			{/each}
 
 			{#if loading}
-				<div class="message assistant">Thinking...</div>
+				<ChatMessage message={{ id: 'loading-indicator', role: 'assistant', text: 'Thinking...' }} />
 			{/if}
 		</div>
 
@@ -202,12 +189,6 @@
 </div>
 
 <style>
-	:global(.message p) {
-		margin: 0;
-	}
-	:global(.message.assistant p + p) {
-		margin-top: 1.5em;
-	}
 	.page-container {
 		max-width: 800px;
 		width: 100%;
@@ -248,36 +229,6 @@
 		gap: 1.5em;
 		flex: 1; /* Grow to fill available space */
 		min-height: 0; /* Prevent flexbox overflow */
-	}
-
-	.message {
-		/* margin-top: 1.5em; */
-		/* Base styling for all messages, will be overridden for assistant/error */
-		font-size: 1em;
-		overflow-wrap: break-word;
-		word-break: break-word; /* For older browser compatibility and stronger breaking */
-	}
-
-	.message.user {
-		padding: 0.69em 1.5em;
-		border-radius: 10.86px;
-		text-align: left;
-		background-color: #d9d9d9;
-		align-self: flex-end; /* Chat bubble effect */
-		max-width: 75%; /* Optional: limit width for bubble effect */
-	}
-
-	.message.assistant,
-	.message.error {
-		padding: 0;
-		border-radius: 0;
-		background-color: transparent;
-		text-align: left;
-		align-self: stretch;
-	}
-
-	.message.error {
-		color: #c00;
 	}
 
 	.keyboard-collapsed-footer {
