@@ -5,24 +5,11 @@
 	import ChatMessage from '$lib/ChatMessage.svelte';
 	import { chatState, sendMessage } from '$lib/chat.svelte';
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
+	import { device, initDeviceListeners } from '$lib/device.svelte';
 
 	let chatInputBoxComponent: ChatInputBox;
-	let isMobileDevice = $state(false);
-	let isKeyboardCollapsed = $state(true);
 
-	// Effect to detect mobile device based on pointer capability
-	$effect(() => {
-		if (typeof window !== 'undefined') {
-			const mediaQuery = window.matchMedia('(pointer: coarse)');
-			isMobileDevice = mediaQuery.matches;
-
-			const handleChange = (e: MediaQueryListEvent) => {
-				isMobileDevice = e.matches;
-			};
-			mediaQuery.addEventListener('change', handleChange);
-			return () => mediaQuery.removeEventListener('change', handleChange);
-		}
-	});
+	initDeviceListeners();
 
 	// Attachment to handle resizing when the virtual keyboard appears on mobile
 	function virtualViewportSizer(node: HTMLDivElement) {
@@ -32,9 +19,6 @@
 
 		const handleResize = () => {
 			node.style.height = `${viewport.height}px`;
-
-			const keyboardThreshold = 150;
-			isKeyboardCollapsed = !(window.innerHeight - viewport.height > keyboardThreshold);
 		};
 
 		handleResize();
@@ -46,12 +30,10 @@
 			viewport.removeEventListener('resize', handleResize);
 		};
 	}
-
-
 	
 	async function handleSend() {
 		await sendMessage();
-		if (chatInputBoxComponent && !isMobileDevice) {
+		if (chatInputBoxComponent && !device.isMobile) {
 			setTimeout(() => {
 				chatInputBoxComponent.focusInput();
 			}, 0);
@@ -80,10 +62,10 @@
 			onSend={handleSend}
 		/>
 	</div>
-	{#if !isMobileDevice}
+	{#if !device.isMobile}
 		<Footer />
 	{/if}
-	{#if isMobileDevice && isKeyboardCollapsed}
+	{#if device.isMobile && device.isKeyboardCollapsed}
 		<footer class="keyboard-collapsed-footer"></footer>
 	{/if}
 </div>
