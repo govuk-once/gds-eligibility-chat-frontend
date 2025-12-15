@@ -4,6 +4,7 @@
 	import ChatInputBox from '$lib/ChatInputBox.svelte';
 	import ChatMessage from '$lib/ChatMessage.svelte';
 	import { chatState, sendMessage } from '$lib/chat.svelte';
+	import { autoScroll } from '$lib/utils/autoScroll.svelte';
 
 	let chatInputBoxComponent: ChatInputBox;
 	let isMobileDevice = $state(false);
@@ -46,13 +47,7 @@
 		};
 	}
 
-	function autoScroll(node: HTMLElement) {
-		$effect(() => {
-			if (chatState.messages.length) {
-				node.scrollTop = node.scrollHeight;
-			}
-		});
-	}
+
 	
 	async function handleSend() {
 		await sendMessage();
