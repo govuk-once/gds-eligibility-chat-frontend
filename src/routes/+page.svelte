@@ -30,7 +30,7 @@
 			viewport.removeEventListener('resize', handleResize);
 		};
 	}
-	
+
 	async function handleSend() {
 		await sendMessage();
 		if (chatInputBoxComponent && !device.isMobile) {
@@ -50,7 +50,9 @@
 			{/each}
 
 			{#if chatState.loading}
-				<ChatMessage message={{ id: 'loading-indicator', role: 'assistant', text: 'Thinking...' }} />
+				<ChatMessage
+					message={{ id: 'loading-indicator', role: 'assistant', text: 'Thinking...' }}
+				/>
 			{/if}
 		</div>
 
@@ -79,17 +81,6 @@
 		box-sizing: border-box; /* Include padding in the width calculation */
 		display: flex;
 		flex-direction: column;
-	}
-	/* A visually hidden class for accessible labels */
-	.visually-hidden {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		padding: 0;
-		margin: -1px;
-		overflow: hidden;
-		clip: rect(0, 0, 0, 0);
-		border: 0;
 	}
 
 	.chat-container {

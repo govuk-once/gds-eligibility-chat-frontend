@@ -1,4 +1,3 @@
-
 interface AdkPart {
 	text: string;
 }

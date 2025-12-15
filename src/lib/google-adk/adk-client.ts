@@ -63,7 +63,7 @@ export const invokeAdkAgent = async (
 	};
 	const body = JSON.stringify(bodyPayload);
 
-	logger.info({ url, body: bodyPayload }, 'Invoking ADK Agent (non-streaming)');
+	logger.info({ url, body: bodyPayload }, 'Invoking ADK Agent');
 
 	const response = await fetch(url, {
 		method: 'POST',
@@ -72,11 +72,10 @@ export const invokeAdkAgent = async (
 	});
 
 	if (!response.ok) {
-		await handleFetchError(response)
+		await handleFetchError(response);
 	}
 
 	const jsonResponse: AdkAgentResponse = await response.json();
 	logger.info({ response: jsonResponse }, 'ADK Agent response');
-	return jsonResponse
+	return jsonResponse;
 };
-
