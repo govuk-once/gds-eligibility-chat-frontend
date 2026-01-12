@@ -1,6 +1,7 @@
 // src/lib/chat.svelte.ts
 import type { Message } from '$lib/types';
 import { markdownToHtml } from '$lib/utils/markdown-to-html';
+import { extractFinalModelResponse } from './utils/extract-final-model-response';
 
 export const chatState = $state({
 	messages: [
@@ -52,23 +53,7 @@ export async function sendMessage() {
 		}
 
 		const resData = await res.json();
-		let fullResponseMarkdown = '';
-
-		if (Array.isArray(resData)) {
-			for (const event of resData) {
-				if (
-					event.content?.role === 'model' &&
-					event.content.parts &&
-					Array.isArray(event.content.parts)
-				) {
-					for (const part of event.content.parts) {
-						if (part.text) {
-							fullResponseMarkdown += part.text;
-						}
-					}
-				}
-			}
-		}
+		let fullResponseMarkdown = extractFinalModelResponse(resData)
 
 		const safeHtml = await markdownToHtml(fullResponseMarkdown);
 
