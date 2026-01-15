@@ -6,10 +6,27 @@
 	import { chatState, sendMessage } from '$lib/chat.svelte';
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
 	import { device, initDeviceListeners } from '$lib/device.svelte';
+	import { onMount, onDestroy } from 'svelte';
 
 	let chatInputBoxComponent: ChatInputBox;
 
 	initDeviceListeners();
+
+	let thinkingText = $state('Thinking');
+	let interval: NodeJS.Timeout;
+
+	onMount(() => {
+		interval = setInterval(() => {
+			thinkingText += '.';
+			if (thinkingText.length > 'Thinking...'.length) {
+				thinkingText = 'Thinking';
+			}
+		}, 350);
+	});
+
+	onDestroy(() => {
+		clearInterval(interval);
+	});
 
 	// Attachment to handle resizing when the virtual keyboard appears on mobile
 	function virtualViewportSizer(node: HTMLDivElement) {
@@ -51,7 +68,7 @@
 
 			{#if chatState.loading}
 				<ChatMessage
-					message={{ id: 'loading-indicator', role: 'assistant', text: 'Thinking...' }}
+					message={{ id: 'loading-indicator', role: 'assistant', text: thinkingText }}
 				/>
 			{/if}
 		</div>

@@ -1,7 +1,7 @@
 // src/lib/chat.svelte.ts
-import type { Message } from '$lib/types';
+import type { Action, Message } from '$lib/types';
 import { markdownToHtml } from '$lib/utils/markdown-to-html';
-import { extractFinalModelResponse } from './utils/extract-final-model-response';
+import { extractFinalModelResponse, type ElicitationResponse } from './utils/extract-final-model-response';
 
 export const chatState = $state({
 	messages: [
@@ -16,22 +16,14 @@ export const chatState = $state({
 	sessionId: undefined as string | undefined
 });
 
-export async function sendMessage() {
-	if (!chatState.input.trim() || chatState.loading) {
-		return;
-	}
 
-	const currentInput = chatState.input;
-	chatState.messages.push({ id: crypto.randomUUID(), role: 'user', text: currentInput });
-	chatState.input = '';
+async function postMessageAndHandleResponse(message: string, isFirstMessage: boolean) {
 	chatState.loading = true;
-
 	const assistantMessageId = crypto.randomUUID();
 	chatState.messages.push({ id: assistantMessageId, role: 'assistant', html: '' });
 
-	const isFirstMessage = !chatState.sessionId;
 	let currentSessionId = chatState.sessionId;
-	if (isFirstMessage) {
+	if (isFirstMessage && !currentSessionId) {
 		currentSessionId = crypto.randomUUID();
 		chatState.sessionId = currentSessionId;
 	}
@@ -41,7 +33,7 @@ export async function sendMessage() {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
-				message: currentInput,
+				message: message,
 				sessionId: currentSessionId,
 				is_first_message: isFirstMessage
 			})
@@ -53,7 +45,9 @@ export async function sendMessage() {
 		}
 
 		const resData = await res.json();
-		let fullResponseMarkdown = extractFinalModelResponse(resData)
+		const finalResponse: ElicitationResponse = extractFinalModelResponse(resData);
+		const fullResponseMarkdown = finalResponse.content;
+		const actions = finalResponse.actions;
 
 		const safeHtml = await markdownToHtml(fullResponseMarkdown);
 
@@ -64,11 +58,15 @@ export async function sendMessage() {
 			} else {
 				assistantMessage.html = 'Received a non-text response from the agent.';
 			}
+			if (actions && actions.length > 0) {
+				assistantMessage.actions = actions;
+			}
 		}
 	} catch (error) {
 		console.error('Fetch Error:', error);
 		const errorMessage = error instanceof Error ? error.message : String(error);
 
+		// Remove the placeholder message
 		chatState.messages = chatState.messages.filter((m) => m.id !== assistantMessageId);
 
 		chatState.messages.push({
@@ -79,4 +77,44 @@ export async function sendMessage() {
 	} finally {
 		chatState.loading = false;
 	}
+}
+
+
+function disablePreviousMessageActions() {
+    if (chatState.messages.length > 0) {
+        const lastMessage = chatState.messages.at(-1); // Get the last message in the chat
+        if (lastMessage && lastMessage.role === 'assistant' && lastMessage.actions) {
+            // Check if it's an assistant message with actions
+            lastMessage.actions = []; // Clear the actions
+        }
+    }
+}
+
+export async function sendPayload(payload: string) {
+	if (chatState.loading) {
+		return;
+	}
+	// Disable actions on the previous message
+    disablePreviousMessageActions();
+	// Add user message for context
+	chatState.messages.push({ id: crypto.randomUUID(), role: 'user', text: payload });
+
+	await postMessageAndHandleResponse(payload, false);
+}
+
+
+export async function sendMessage() {
+	const currentInput = chatState.input.trim();
+	if (!currentInput || chatState.loading) {
+		return;
+	}
+
+    // Disable actions on the previous message
+    disablePreviousMessageActions();
+	chatState.messages.push({ id: crypto.randomUUID(), role: 'user', text: currentInput });
+	chatState.input = '';
+
+	const isFirstMessage = !chatState.sessionId;
+
+	await postMessageAndHandleResponse(currentInput, isFirstMessage);
 }

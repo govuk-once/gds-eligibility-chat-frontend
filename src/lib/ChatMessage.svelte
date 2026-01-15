@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Message } from '$lib/types';
+	import { sendPayload } from '$lib/chat.svelte';
 
 	export let message: Message;
 </script>
@@ -11,6 +12,16 @@
 		{@html message.html}
 	{:else}
 		{message.text}
+	{/if}
+
+	{#if message.actions && message.actions.length > 0}
+		<div class="actions">
+			{#each message.actions as action}
+				<button on:click={() => sendPayload(action.payload)}>
+					{action.label}
+				</button>
+			{/each}
+		</div>
 	{/if}
 </div>
 
@@ -47,5 +58,22 @@
 
 	.message.error {
 		color: #c00;
+	}
+
+	.actions {
+		margin-top: 1em;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+	}
+
+	.actions button {
+		background-color: black;
+		color: white;
+		border: none;
+		padding: 0.75em 1em;
+		border-radius: 5px;
+		cursor: pointer;
+		text-align: center;
 	}
 </style>
