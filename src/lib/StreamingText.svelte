@@ -1,9 +1,11 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { markdownToHtml } from './utils/markdown-to-html';
+	import { finishedStreaming } from './chat.svelte';
 
 	export let content: string;
 	export let stream = false;
+	export let messageId: string;
 
 	let displayedContent = '';
 	let htmlContent = '';
@@ -36,6 +38,7 @@
 				if (intervalId) clearInterval(intervalId);
 				displayedContent = content;
 				updateHtml(content);
+				finishedStreaming(messageId);
 			}
 		}, currentDelay);
 	}

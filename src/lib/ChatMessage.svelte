@@ -11,7 +11,7 @@
 <div class="message {message.role}">
 	{#if message.html}
 		{#if message.role === 'assistant' && isLast && !loading && message.markdown}
-			<StreamingText content={message.markdown} stream={true} />
+			<StreamingText messageId={message.id} content={message.markdown} stream={true} />
 		{:else}
 			<!-- we have sanitised message.html with DOMPurify -->
 			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -21,7 +21,7 @@
 		{message.text}
 	{/if}
 
-	{#if message.actions && message.actions.length > 0}
+	{#if message.actions && message.actions.length > 0 && !message.streaming}
 		<div class="actions">
 			{#each message.actions as action (action.label)}
 				<button on:click={() => sendPayload(action.payload)}>

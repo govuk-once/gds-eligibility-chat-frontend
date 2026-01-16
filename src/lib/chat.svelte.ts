@@ -19,14 +19,13 @@ export const chatState = $state({
 async function postMessageAndHandleResponse(message: string, isFirstMessage: boolean) {
 	chatState.loading = true;
 	const assistantMessageId = crypto.randomUUID();
-	chatState.messages.push({ id: assistantMessageId, role: 'assistant', html: '' });
+	chatState.messages.push({ id: assistantMessageId, role: 'assistant', html: '', streaming: true });
 
 	let currentSessionId = chatState.sessionId;
 	if (isFirstMessage && !currentSessionId) {
 		currentSessionId = crypto.randomUUID();
 		chatState.sessionId = currentSessionId;
 	}
-
 	try {
 		const res = await fetch('/api/chat', {
 			method: 'POST',
@@ -76,6 +75,12 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 		});
 	} finally {
 		chatState.loading = false;
+	}
+}
+export function finishedStreaming(messageId: string) {
+	const message = chatState.messages.find((m) => m.id === messageId);
+	if (message) {
+		message.streaming = false;	
 	}
 }
 
