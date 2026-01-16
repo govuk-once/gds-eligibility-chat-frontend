@@ -62,13 +62,14 @@
 	<Header />
 	<div class="chat-container">
 		<div class="chat-window" {@attach autoScroll}>
-			{#each chatState.messages as m (m.id)}
-				<ChatMessage message={m} />
-			{/each}
-
+			      {#each chatState.messages as m, i (m.id)}
+			        <ChatMessage message={m} isLast={i === chatState.messages.length - 1} loading={chatState.loading} />
+			      {/each}
 			{#if chatState.loading}
 				<ChatMessage
 					message={{ id: 'loading-indicator', role: 'assistant', text: thinkingText }}
+					isLast={true}
+					loading={chatState.loading}
 				/>
 			{/if}
 		</div>

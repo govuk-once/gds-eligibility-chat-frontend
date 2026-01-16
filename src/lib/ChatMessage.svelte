@@ -1,22 +1,29 @@
 <script lang="ts">
 	import type { Message } from '$lib/types';
 	import { sendPayload } from '$lib/chat.svelte';
+	import StreamingText from './StreamingText.svelte';
 
 	export let message: Message;
+	export let isLast: boolean;
+	export let loading: boolean;
 </script>
 
 <div class="message {message.role}">
 	{#if message.html}
-		<!-- we have sanitised message.html with DOMPurify -->
-		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-		{@html message.html}
+		{#if message.role === 'assistant' && isLast && !loading && message.markdown}
+			<StreamingText content={message.markdown} stream={true} />
+		{:else}
+			<!-- we have sanitised message.html with DOMPurify -->
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+			{@html message.html}
+		{/if}
 	{:else}
 		{message.text}
 	{/if}
 
 	{#if message.actions && message.actions.length > 0}
 		<div class="actions">
-			{#each message.actions as action}
+			{#each message.actions as action (action.label)}
 				<button on:click={() => sendPayload(action.payload)}>
 					{action.label}
 				</button>

@@ -35,8 +35,8 @@ export function extractFinalModelResponse(resData: Event[]): ElicitationResponse
 							actions: parsed.actions || []
 						};
 					}
-				} catch (e) {
-					// Not a JSON object, so it's just plain text content.
+				} catch {
+					// Not a JSON object, so it's just plain text content - not ideal, fix later
 				}
 				// If it's not JSON or doesn't match the structure, treat the whole thing as content.
 				return { content: visibleText };

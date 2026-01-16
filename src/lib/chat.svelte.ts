@@ -1,5 +1,4 @@
-// src/lib/chat.svelte.ts
-import type { Action, Message } from '$lib/types';
+import type { Message } from '$lib/types';
 import { markdownToHtml } from '$lib/utils/markdown-to-html';
 import { extractFinalModelResponse, type ElicitationResponse } from './utils/extract-final-model-response';
 
@@ -53,6 +52,7 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 
 		const assistantMessage = chatState.messages.find((m) => m.id === assistantMessageId);
 		if (assistantMessage) {
+			assistantMessage.markdown = fullResponseMarkdown;
 			if (safeHtml) {
 				assistantMessage.html = safeHtml;
 			} else {

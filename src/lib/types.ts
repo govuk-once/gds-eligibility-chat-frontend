@@ -8,5 +8,6 @@ export type Message = {
 	role: 'user' | 'assistant' | 'error';
 	text?: string;
 	html?: string;
+	markdown?: string;
 	actions?: Action[];
 };
