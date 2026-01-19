@@ -3,6 +3,9 @@
 	import { sendPayload } from '$lib/chat.svelte';
 	import StreamingText from './StreamingText.svelte';
 	import { getRandomDelay } from '$lib/utils/random-delay';
+	import UserAgentMessageInput from './UserAgentMessageInput.svelte';
+	import BenefitAgentMessageInput from './BenefitAgentMessageInput.svelte';
+	import Button from '$lib/Button.svelte';
 
 	let { message, isLast, loading, onUpdate } = $props<{
 		message: Message;
@@ -71,13 +74,17 @@
 	{/if}
 
 	{#if displayedActions.length > 0}
-		<div class="actions">
-			{#each displayedActions as action (action.label)}
-				<button onclick={() => sendPayload(action.payload)}>
-					{action.label}
-				</button>
-			{/each}
-		</div>
+		{#if message.source === 'user_agent'}
+			<UserAgentMessageInput {message} {displayedActions} />
+		{:else if message.source === 'benefit_agent'}
+			<BenefitAgentMessageInput {message} {displayedActions} />
+		{:else}
+			<div class="actions">
+				{#each displayedActions as action (action.label)}
+					<Button onclick={() => sendPayload(action.payload)} label={action.label} />
+				{/each}
+			</div>
+		{/if}
 	{/if}
 </div>
 
@@ -121,15 +128,5 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5em;
-	}
-
-	.actions button {
-		background-color: black;
-		color: white;
-		border: none;
-		padding: 0.75em 1em;
-		border-radius: 5px;
-		cursor: pointer;
-		text-align: center;
 	}
 </style>

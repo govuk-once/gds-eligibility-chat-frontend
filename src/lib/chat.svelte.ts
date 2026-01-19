@@ -1,5 +1,6 @@
 import type { Message } from '$lib/types';
 import { markdownToHtml } from '$lib/utils/markdown-to-html';
+import { parseUserAgentMultipleChoice } from '$lib/utils/parse-user-agent-multiple-choice';
 import { extractFinalModelResponse, type ElicitationResponse } from './utils/extract-final-model-response';
 
 export const chatState = $state({
@@ -44,14 +45,21 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 
 		const resData = await res.json();
 		const finalResponse: ElicitationResponse = extractFinalModelResponse(resData);
-		const fullResponseMarkdown = finalResponse.content;
+		console.log("HERE!!")
+		console.log(finalResponse)
+		console.log("***********")
+		const fullResponseMarkdown = (finalResponse.source === "user_agent" && finalResponse.reply_type === 'choice_multiple') ? parseUserAgentMultipleChoice(finalResponse) : finalResponse.content;
 		const actions = finalResponse.actions;
+		const source = finalResponse.source;
+		const reply_type = finalResponse.reply_type;
 
-		const safeHtml = await markdownToHtml(fullResponseMarkdown);
+		const safeHtml = await markdownToHtml(fullResponseMarkdown); // is this still needed? we 'stream' agent responses with html conversion
 
 		const assistantMessage = chatState.messages.find((m) => m.id === assistantMessageId);
 		if (assistantMessage) {
 			assistantMessage.markdown = fullResponseMarkdown;
+			assistantMessage.source = source || 'user_agent';
+			assistantMessage.reply_type = reply_type || 'free_text';
 			if (safeHtml) {
 				assistantMessage.html = safeHtml;
 			} else {
@@ -61,6 +69,8 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 				assistantMessage.actions = actions;
 			}
 		}
+		console.log("MESSAGES HERE:")
+		console.log(chatState.messages)
 	} catch (error) {
 		console.error('Fetch Error:', error);
 		const errorMessage = error instanceof Error ? error.message : String(error);

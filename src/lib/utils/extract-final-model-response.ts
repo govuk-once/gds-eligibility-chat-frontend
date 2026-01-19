@@ -3,6 +3,8 @@ import type { Action } from '$lib/types';
 
 export type ElicitationResponse = {
 	content: string;
+	source?: 'user_agent' | 'benefit_agent';
+	reply_type?: "yes_no" | "choice_multiple" | "choice_single" | "free_text" | "none",	
 	actions?: Action[];
 };
 
@@ -32,6 +34,8 @@ export function extractFinalModelResponse(resData: Event[]): ElicitationResponse
 					if (typeof parsed === 'object' && parsed !== null && 'content' in parsed) {
 						return {
 							content: parsed.content,
+							source: parsed.source || 'user_agent',
+							reply_type: parsed.reply_type || 'free_text',
 							actions: parsed.actions || []
 						};
 					}
