@@ -1,17 +1,66 @@
 <script lang="ts">
-	import type { Message } from '$lib/types';
+	import type { Message, Action } from '$lib/types';
 	import { sendPayload } from '$lib/chat.svelte';
 	import StreamingText from './StreamingText.svelte';
+	import { getRandomDelay } from '$lib/utils/random-delay';
 
-	export let message: Message;
-	export let isLast: boolean;
-	export let loading: boolean;
+	let { message, isLast, loading, onUpdate } = $props<{
+		message: Message;
+		isLast: boolean;
+		loading: boolean;
+		onUpdate?: () => void;
+	}>();
+
+	let displayedActions = $state<Action[]>([]);
+	const timeouts = new Set<NodeJS.Timeout>();
+
+	$effect.pre(() => {
+		// This cleanup function runs before the main effect,
+		// and whenever the component is unmounted.
+		return () => {
+			for (const handle of timeouts) {
+				clearTimeout(handle);
+			}
+			timeouts.clear();
+		};
+	});
+
+	$effect(() => {
+		// When the message prop itself changes, this effect re-runs.
+		// The cleanup function from $effect.pre ensures we start fresh.
+		const _ = message.id; // Establish dependency on the message ID
+		displayedActions = [];
+
+		// Schedule the animations for the new message
+		if (!message.streaming && message.actions) {
+			let cumulativeDelay = 0;
+			message.actions.forEach((action: Action, index: number) => {
+				cumulativeDelay += getRandomDelay(100, 250);
+				const handle = setTimeout(() => {
+					displayedActions.push(action);
+					timeouts.delete(handle);
+					// If this is the last action, call the update callback
+					if (index === message.actions!.length - 1) {
+						if (onUpdate) {
+							onUpdate();
+						}
+					}
+				}, cumulativeDelay);
+				timeouts.add(handle);
+			});
+		}
+	});
 </script>
 
 <div class="message {message.role}">
 	{#if message.html}
 		{#if message.role === 'assistant' && isLast && !loading && message.markdown}
-			<StreamingText messageId={message.id} content={message.markdown} stream={true} />
+			<StreamingText
+				messageId={message.id}
+				content={message.markdown}
+				stream={true}
+				{onUpdate}
+			/>
 		{:else}
 			<!-- we have sanitised message.html with DOMPurify -->
 			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -21,10 +70,10 @@
 		{message.text}
 	{/if}
 
-	{#if message.actions && message.actions.length > 0 && !message.streaming}
+	{#if displayedActions.length > 0}
 		<div class="actions">
-			{#each message.actions as action (action.label)}
-				<button on:click={() => sendPayload(action.payload)}>
+			{#each displayedActions as action (action.label)}
+				<button onclick={() => sendPayload(action.payload)}>
 					{action.label}
 				</button>
 			{/each}

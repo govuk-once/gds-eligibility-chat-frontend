@@ -9,6 +9,7 @@
 	import { onMount, onDestroy } from 'svelte';
 
 	let chatInputBoxComponent: ChatInputBox;
+	let chatWindowEl: HTMLDivElement;
 
 	initDeviceListeners();
 
@@ -56,14 +57,28 @@
 			}, 0);
 		}
 	}
+	function handleStreamUpdate() {
+		if (chatWindowEl) {
+			// Wait for the next frame to allow the DOM to update
+			// before we measure the new scrollHeight.
+			requestAnimationFrame(() => {
+				chatWindowEl.scrollTop = chatWindowEl.scrollHeight;
+			});
+		}
+	}
 </script>
 
 <div class="page-container" {@attach virtualViewportSizer}>
 	<Header />
 	<div class="chat-container">
-		<div class="chat-window" {@attach autoScroll}>
+		<div class="chat-window" use:autoScroll bind:this={chatWindowEl}>
 			      {#each chatState.messages as m, i (m.id)}
-			        <ChatMessage message={m} isLast={i === chatState.messages.length - 1} loading={chatState.loading} />
+			        <ChatMessage
+								message={m}
+								isLast={i === chatState.messages.length - 1}
+								loading={chatState.loading}
+								onUpdate={handleStreamUpdate}
+							/>
 			      {/each}
 			{#if chatState.loading}
 				<ChatMessage
@@ -128,3 +143,4 @@
 		flex-shrink: 0;
 	}
 </style>
+

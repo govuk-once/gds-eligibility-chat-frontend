@@ -2,10 +2,12 @@
 	import { onMount } from 'svelte';
 	import { markdownToHtml } from './utils/markdown-to-html';
 	import { finishedStreaming } from './chat.svelte';
+	import { getRandomDelay } from '$lib/utils/random-delay';
 
 	export let content: string;
 	export let stream = false;
 	export let messageId: string;
+	export let onUpdate: (() => void) | undefined = undefined;
 
 	let displayedContent = '';
 	let htmlContent = '';
@@ -13,6 +15,9 @@
 
 	async function updateHtml(markdown: string) {
 		htmlContent = await markdownToHtml(markdown);
+		if (onUpdate) {
+			onUpdate();
+		}
 	}
 
 	function startStreaming() {
@@ -21,7 +26,7 @@
 		displayedContent = '';
 		const words = content.split(' ');
 		let i = 0;
-		const currentDelay = Math.floor(Math.random() * (180 - 100 + 1)) + 100; // between 100-180
+		const currentDelay = getRandomDelay(100, 180);
 
 		intervalId = setInterval(() => {
 			const chunkSize = Math.floor(Math.random() * 2) + 2; // 2 or 3 words
