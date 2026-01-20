@@ -1,12 +1,13 @@
 <script lang="ts">
-	let { onclick, label, color = 'black' } = $props<{
+	let { onclick, label, color = 'black', disabled = false } = $props<{
 		onclick: () => void;
 		label: string;
 		color?: string;
+		disabled?: boolean;
 	}>();
 </script>
 
-<button onclick={onclick} style="background-color: {color};">
+<button onclick={onclick} style="background-color: {color};" disabled={disabled}>
 	{label}
 </button>
 

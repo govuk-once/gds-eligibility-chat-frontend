@@ -45,9 +45,6 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 
 		const resData = await res.json();
 		const finalResponse: ElicitationResponse = extractFinalModelResponse(resData);
-		console.log("HERE!!")
-		console.log(finalResponse)
-		console.log("***********")
 		const fullResponseMarkdown = (finalResponse.source === "user_agent" && finalResponse.reply_type === 'choice_multiple') ? parseUserAgentMultipleChoice(finalResponse) : finalResponse.content;
 		const actions = finalResponse.actions;
 		const source = finalResponse.source;
@@ -69,8 +66,6 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 				assistantMessage.actions = actions;
 			}
 		}
-		console.log("MESSAGES HERE:")
-		console.log(chatState.messages)
 	} catch (error) {
 		console.error('Fetch Error:', error);
 		const errorMessage = error instanceof Error ? error.message : String(error);
