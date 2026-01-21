@@ -93,7 +93,7 @@
 			bind:this={chatInputBoxComponent}
 			bind:value={chatState.input}
 			loading={chatState.loading}
-			placeholder="Ask me anything"
+			placeholder=""
 			onSend={handleSend}
 		/>
 	</div>
@@ -110,7 +110,7 @@
 		max-width: 800px;
 		width: 100%;
 		margin: 0 auto; /* Horizontal centering */
-		padding: 0 2em; /* Add 2em "margins" on each side visually */
+		/* padding: 0 2em; Add 2em "margins" on each side visually */
 		box-sizing: border-box; /* Include padding in the width calculation */
 		display: flex;
 		flex-direction: column;
@@ -121,7 +121,7 @@
 		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		/* gap: 1rem; */
 		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		flex: 1;
 		min-height: 0;
@@ -132,7 +132,7 @@
 		overflow-y: auto;
 		display: flex;
 		flex-direction: column;
-		gap: 1.5em;
+		gap: 1.5em; /* gap between items in chat window */
 		flex: 1; /* Grow to fill available space */
 		min-height: 0; /* Prevent flexbox overflow */
 	}

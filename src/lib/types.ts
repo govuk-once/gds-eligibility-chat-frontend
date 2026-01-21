@@ -21,6 +21,10 @@ export type Message = {
 
 	actions?: Action[];
 
-	streaming?: boolean;
+		streaming?: boolean;
 
-};
+		vault?: boolean;
+
+	};
+
+	

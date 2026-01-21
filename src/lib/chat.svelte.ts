@@ -8,7 +8,7 @@ export const chatState = $state({
 		{
 			id: crypto.randomUUID(),
 			role: 'assistant',
-			html: '<b>Hi!</b> How can I help you today?'
+			html: '<p><b>Hi!</b> How can I help you today?</p>',
 		}
 	] as Message[],
 	input: '',
@@ -45,7 +45,25 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 
 		const resData = await res.json();
 		const finalResponse: ElicitationResponse = extractFinalModelResponse(resData);
-		const fullResponseMarkdown = (finalResponse.source === "user_agent" && finalResponse.reply_type === 'choice_multiple') ? parseUserAgentMultipleChoice(finalResponse) : finalResponse.content;
+	
+// 	const finalResponse = {
+//     content: "Do you live in the United Kingdom?",
+//     source: "benefit_agent",
+//     reply_type: "yes_no",
+//     actions: [
+//         {
+//             label: "Yes",
+//             payload: "Yes"
+//         },
+//         {
+//             label: "No",
+//             payload: "No"
+//         }
+//     ]
+// }
+
+	
+	const fullResponseMarkdown = (finalResponse.source === "user_agent" && finalResponse.reply_type === 'choice_multiple') ? parseUserAgentMultipleChoice(finalResponse) : finalResponse.content;
 		const actions = finalResponse.actions;
 		const source = finalResponse.source;
 		const reply_type = finalResponse.reply_type;
@@ -100,6 +118,11 @@ function disablePreviousMessageActions() {
     }
 }
 
+function shouldVault(): boolean {
+	const lastMessage = chatState.messages.at(-1);
+	return lastMessage?.source === 'benefit_agent';
+}
+
 export async function sendPayload(payload: string) {
 	if (chatState.loading) {
 		return;
@@ -107,7 +130,7 @@ export async function sendPayload(payload: string) {
 	// Disable actions on the previous message
     disablePreviousMessageActions();
 	// Add user message for context
-	chatState.messages.push({ id: crypto.randomUUID(), role: 'user', text: payload });
+	chatState.messages.push({ id: crypto.randomUUID(), role: 'user', text: payload, vault: shouldVault() });
 
 	await postMessageAndHandleResponse(payload, false);
 }
@@ -121,7 +144,7 @@ export async function sendMessage() {
 
     // Disable actions on the previous message
     disablePreviousMessageActions();
-	chatState.messages.push({ id: crypto.randomUUID(), role: 'user', text: currentInput });
+	chatState.messages.push({ id: crypto.randomUUID(), role: 'user', text: currentInput, vault: shouldVault() });
 	chatState.input = '';
 
 	const isFirstMessage = !chatState.sessionId;

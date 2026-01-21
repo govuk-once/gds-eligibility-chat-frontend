@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Action } from '$lib/types';
-	import Button from '$lib/Button.svelte';
 	import { sendPayload } from '$lib/chat.svelte';
+	import SubmitButton from '$lib/SubmitButton.svelte';
 
 	let { actions } = $props<{
 		actions: Action[];
@@ -29,10 +29,7 @@
 		{/each}
 	</div>
 
-	<div class="submit-button-container">
-		<div></div>
-		<Button onclick={handleSubmit} label="Submit" disabled={!selectedValue} />
-	</div>
+	<SubmitButton onclick={handleSubmit} disabled={!selectedValue} />
 </div>
 
 <style>
@@ -107,20 +104,5 @@
 
 	.radio-label input[type='radio']:checked + .radio-custom::after {
 		display: block;
-	}
-
-	.submit-button-container {
-		display: flex;
-		gap: 0.5em;
-		width: 100%;
-	}
-
-	.submit-button-container > div:first-child {
-		flex: 1;
-	}
-
-	.submit-button-container :global(button) {
-		flex: 1;
-		width: 100%;
 	}
 </style>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Action } from '$lib/types';
-	import Button from '$lib/Button.svelte';
 	import { sendPayload } from '$lib/chat.svelte';
+	import SubmitButton from '$lib/SubmitButton.svelte';
 
 	let { actions } = $props<{
 		actions: Action[];
@@ -22,17 +22,14 @@
 			<div>
 				<label class="checklist-label">
 					{action.label}
-					<input type="checkbox" bind:group={selectedPayloads} value={action.action} />
+					<input type="checkbox" bind:group={selectedPayloads} value={action.payload} />
 					<span class="checklist-custom"></span>
 				</label>
 			</div>
 		{/each}
 	</div>
 
-	<div class="submit-button-container">
-		<div></div>
-		<Button onclick={handleSubmit} label="Submit" disabled={selectedPayloads.length === 0} />
-	</div>
+	<SubmitButton onclick={handleSubmit} disabled={selectedPayloads.length === 0} />
 </div>
 
 <style>
@@ -109,20 +106,5 @@
 
 	.checklist-label input[type='checkbox']:checked + .checklist-custom::after {
 		display: block;
-	}
-
-	.submit-button-container {
-		display: flex;
-		gap: 0.5em;
-		width: 100%;
-	}
-
-	.submit-button-container > div:first-child {
-		flex: 1;
-	}
-
-	.submit-button-container :global(button) {
-		flex: 1;
-		width: 100%;
 	}
 </style>

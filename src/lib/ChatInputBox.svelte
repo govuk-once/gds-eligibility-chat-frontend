@@ -42,8 +42,8 @@
 
 <style>
 	.chat-input-wrapper {
-		margin-top: 1.5em;
-		margin-bottom: 1.5em;
+		margin: 1.5em 2em;
+		height: 2.75em;
 	}
 
 	.chat-input-box {

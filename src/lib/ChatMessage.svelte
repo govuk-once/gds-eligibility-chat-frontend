@@ -55,22 +55,35 @@
 	});
 </script>
 
-<div class="message {message.role}">
-	{#if message.html}
-		{#if message.role === 'assistant' && isLast && !loading && message.markdown}
-			<StreamingText
-				messageId={message.id}
-				content={message.markdown}
-				stream={true}
-				{onUpdate}
-			/>
+<div class="message {message.role} {message.vault ? 'vault' : ''}">
+	<div class="message-content">
+		{#if message.html}
+			{#if message.role === 'assistant' && isLast && !loading && message.markdown}
+				<StreamingText
+					messageId={message.id}
+					content={message.markdown}
+					stream={true}
+					{onUpdate}
+				/>
+			{:else}
+				<!-- we have sanitised message.html with DOMPurify -->
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				{@html message.html}
+			{/if}
 		{:else}
-			<!-- we have sanitised message.html with DOMPurify -->
-			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-			{@html message.html}
+			{message.text}
 		{/if}
-	{:else}
-		{message.text}
+	</div>
+
+	{#if message.vault}
+		<div class="shield-icon">
+			<img
+				src="/icons/shield-check.svg"
+				alt="vaulted response"
+				aria-hidden="true"
+				class="privacy-icon"
+			/>
+		</div>
 	{/if}
 
 	{#if displayedActions.length > 0}
@@ -91,6 +104,8 @@
 <style>
 	:global(.message p) {
 		margin: 0;
+		padding-left: 1em;
+		padding-right: 1em;
 	}
 	:global(.message.assistant p + p) {
 		margin-top: 1.5em;
@@ -102,23 +117,32 @@
 	}
 
 	.message.user {
-		padding: 0.69em 1.5em;
+		padding: 0.75em 1em;
 		border-radius: 10.86px;
+		margin-right: 1em;
+		margin-left: 4.5em;
 		text-align: left;
 		background-color: #d9d9d9;
 		align-self: flex-end;
-		max-width: 75%;
+		max-width: 100%;
+		display: flex;
+		gap: 0.5em;
+		align-items: center;
+	}
+
+	.message.user.vault {
+		padding: 0.75em 1em 0.75em 1.5em;
+		gap: 0.5em;
 	}
 
 	.message.assistant,
 	.message.error {
-		padding: 0;
+		padding-left: 0;
 		border-radius: 0;
 		background-color: transparent;
 		text-align: left;
 		align-self: stretch;
 	}
-
 	.message.error {
 		color: #c00;
 	}
@@ -128,5 +152,16 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5em;
+	}
+	.shield-icon{
+		display: flex;
+		align-items: flex-end;   /* bottom */
+		justify-content: flex-end; /* right */
+		align-self: flex-end;
+	}
+
+	.privacy-icon {
+		width: 1em;
+		height: 1em;
 	}
 </style>
