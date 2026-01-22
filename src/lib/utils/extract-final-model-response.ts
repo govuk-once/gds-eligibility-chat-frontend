@@ -9,44 +9,63 @@ export type ElicitationResponse = {
 };
 
 export function extractFinalModelResponse(resData: Event[]): ElicitationResponse {
-	if (!Array.isArray(resData)) return { content: '' };
+  if (!Array.isArray(resData)) return {content:'There has been an error. Please try again.'};
 
-	for (let i = resData.length - 1; i >= 0; i--) {
-		const event = resData[i];
+  // Loop backwards to get the most recent emit_elicitation_response
+  for (let i = resData.length - 1; i >= 0; i--) {
+    const event = resData[i];
+    if (!event?.content?.parts) continue;
 
-		if (event.content?.role === 'model' && Array.isArray(event.content.parts)) {
-			const visibleText = event.content.parts
-				.filter((part) => part.text && !part.thought && !part.functionCall)
-				.map((part) => part.text)
-				.join('');
+    for (const part of event.content.parts) {
+      const funcResp = part.functionResponse;
+      if (
+        funcResp &&
+        funcResp.name === "emit_elicitation_response" &&
+        funcResp.response &&
+        typeof funcResp.response === "object"
+      ) {
+        const r = funcResp.response as {
+          content?: string;
+          source?: string;
+          reply_type?: string;
+          actions?: any[];
+        };
 
-			if (visibleText.trim()) {
-				// Try to find json in markdown code block
-				const mdJsonMatch = visibleText.match(/```(json)?\s*([\s\S]+?)\s*```/);
-				let jsonText = visibleText;
-				if (mdJsonMatch && mdJsonMatch[2]) {
-					jsonText = mdJsonMatch[2];
-				}
+        // Narrow source to allowed union
+        const source: 'user_agent' | 'benefit_agent' =
+          r.source === 'benefit_agent' ? 'benefit_agent' : 'user_agent';
 
-				try {
-					const parsed = JSON.parse(jsonText);
-					// Check if it's the object structure we expect
-					if (typeof parsed === 'object' && parsed !== null && 'content' in parsed) {
-						return {
-							content: parsed.content,
-							source: parsed.source || 'user_agent',
-							reply_type: parsed.reply_type || 'free_text',
-							actions: parsed.actions || []
-						};
-					}
-				} catch {
-					// Not a JSON object, so it's just plain text content - not ideal, fix later
-				}
-				// If it's not JSON or doesn't match the structure, treat the whole thing as content.
-				return { content: visibleText };
-			}
-		}
-	}
+        // Narrow reply_type to allowed union
+        const reply_type: ElicitationResponse['reply_type'] =
+          r.reply_type === "yes_no" ||
+          r.reply_type === "choice_multiple" ||
+          r.reply_type === "choice_single" ||
+          r.reply_type === "free_text" ||
+          r.reply_type === "none"
+            ? r.reply_type
+            : "none";
 
-	return { content: '' };
+        // Ensure actions are well-formed
+        const actions: Action[] = Array.isArray(r.actions)
+          ? r.actions
+              .filter(
+                (a) =>
+                  a &&
+                  typeof a.label === "string" &&
+                  typeof a.payload === "string"
+              )
+              .map((a) => ({ label: a.label, payload: a.payload }))
+          : [];
+
+        return {
+          content: r.content ?? "",
+          source,
+          reply_type,
+          actions
+        };
+      }
+    }
+  }
+
+  return {content: 'There has been an error. Please try again.'};
 }
