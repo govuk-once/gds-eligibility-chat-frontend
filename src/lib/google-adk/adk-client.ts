@@ -1,13 +1,9 @@
 import { logger } from '../utils/logger.js';
-import { PUBLIC_ADK_API_URL } from '$env/dynamic/public';
+import { env } from '$env/dynamic/public';
 import { handleFetchError } from '$lib/utils/handle-fetch-error.js';
 import type { AdkAgentResponse } from './adk-types.js';
 
-if (!PUBLIC_ADK_API_URL) {
-	throw new Error('PUBLIC_ADK_API_URL is not set');
-}
-
-const ADK_API_BASE_URL = PUBLIC_ADK_API_URL;
+const ADK_API_BASE_URL = env.PUBLIC_ADK_API_URL;
 
 export const createAdkSession = async (
 	appName: string,
