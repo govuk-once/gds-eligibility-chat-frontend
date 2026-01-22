@@ -44,38 +44,25 @@
 	.submit-button-container :global(button) {
 		flex: 1;
 		width: 100%;
+		margin: 0;
 	}
 
-	/* .privacy-note {
+	.privacy-note {
 		margin-top: 0.5em;
 		font-size: 1em;
 		color: #AAAAAA;
-		text-align: right;
+		display: inline-flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 0.35em;
+		width: 100%;
+		line-height: 1;
 	}
-
 	.privacy-icon {
-	width: 1.25em;
-	height: 1.25em;
-	transform: translateY(0.2em);
-	} */
-
-	 .privacy-note {
-	margin-top: 0.5em;
-	font-size: 1em;
-	color: #AAAAAA;
-	display: inline-flex;
-	align-items: center;
-	justify-content: flex-end;
-	gap: 0.35em;
-	width: 100%;
-	line-height: 1;
-}
-
-.privacy-icon {
-	width: 1.35em;
-	height: 1.35em;
-	display: block;
-	overflow: hidden;
-	padding-bottom: 0.1em;
-}
+		width: 1.35em;
+		height: 1.35em;
+		display: block;
+		overflow: hidden;
+		padding-bottom: 0.1em;
+	}
 </style>

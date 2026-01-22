@@ -120,7 +120,7 @@ function disablePreviousMessageActions() {
 
 function shouldVault(): boolean {
 	const lastMessage = chatState.messages.at(-1);
-	return lastMessage?.source === 'benefit_agent';
+	return lastMessage?.source === 'benefit_agent' && lastMessage.reply_type !== 'free_text';
 }
 
 export async function sendPayload(payload: string) {

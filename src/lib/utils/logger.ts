@@ -1,9 +1,11 @@
 import { pino } from 'pino';
-import { PINO_LOG_LEVEL } from '$env/static/private';
 import { dev } from '$app/environment';
+import { env } from '$env/dynamic/private';
+
+const level = env.PINO_LOG_LEVEL ?? ( dev ? 'debug' : 'info')
 
 export const logger = pino({
-	level: PINO_LOG_LEVEL || 'info',
+	level,
 	transport: dev
 		? {
 				target: 'pino-pretty',

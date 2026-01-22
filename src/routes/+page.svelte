@@ -82,7 +82,7 @@
 			      {/each}
 			{#if chatState.loading}
 				<ChatMessage
-					message={{ id: 'loading-indicator', role: 'assistant', text: thinkingText }}
+					message={{ id: 'loading-indicator', role: 'assistant', html: '<p>' + thinkingText + '</p>' }}
 					isLast={true}
 					loading={chatState.loading}
 				/>
@@ -110,7 +110,7 @@
 		max-width: 800px;
 		width: 100%;
 		margin: 0 auto; /* Horizontal centering */
-		/* padding: 0 2em; Add 2em "margins" on each side visually */
+		/* padding: 0 2em; */
 		box-sizing: border-box; /* Include padding in the width calculation */
 		display: flex;
 		flex-direction: column;

@@ -107,6 +107,15 @@
 		padding-left: 1em;
 		padding-right: 1em;
 	}
+
+	:global(.message ol ul h1 h2 h3 h4 h5 h6) {
+		padding-left: 1em;
+		padding-right: 1em;
+	}
+
+	:global(.message li) {
+		padding-right: 1em;
+	}
 	:global(.message.assistant p + p) {
 		margin-top: 1.5em;
 	}
@@ -163,5 +172,6 @@
 	.privacy-icon {
 		width: 1em;
 		height: 1em;
+		padding-bottom: 0.1em;
 	}
 </style>

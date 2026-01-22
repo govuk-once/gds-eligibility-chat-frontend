@@ -24,5 +24,6 @@
 		align-items: center;
 		justify-content: center;
 		border-radius: 0.5em;
+		margin: 0 1em;
 	}
 </style>

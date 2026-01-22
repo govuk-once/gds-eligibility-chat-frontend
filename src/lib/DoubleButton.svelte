@@ -18,11 +18,13 @@
 	.double-button-container {
 		display: flex;
 		gap: 0.5em;
-		width: 100%; /* Fill the width of the parent */
+		width: 100%;
+		box-sizing: border-box;
+		padding: 0 1em; /* optional padding instead of margin */
 	}
 
 	.double-button-container :global(button) {
-		flex: 1; /* Each button takes equal space */
-		width: 100%; /* Ensure buttons fill their flex space */
+		flex: 1;
+		margin: 0;
 	}
 </style>

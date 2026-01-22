@@ -70,7 +70,7 @@
 	}
 
 	.notification-dot span {
-		font-size: 0.5em;
+		font-size: 0.6em;
 		font-weight: bold;
 		font-family: sans-serif;
 	}

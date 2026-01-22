@@ -1,20 +1,16 @@
 import { logger } from '../utils/logger.js';
-import { PUBLIC_ADK_API_URL } from '$env/static/public';
+import { env } from '$env/dynamic/private';
 import { handleFetchError } from '$lib/utils/handle-fetch-error.js';
 import type { AdkAgentResponse } from './adk-types.js';
 
-if (!PUBLIC_ADK_API_URL) {
-	throw new Error('PUBLIC_ADK_API_URL is not set');
-}
-
-const ADK_API_BASE_URL = PUBLIC_ADK_API_URL;
+const baseUrl = env.PUBLIC_ADK_API_URL ?? 'http://127.0.0.1:8001'
 
 export const createAdkSession = async (
 	appName: string,
 	userId: string,
 	sessionId: string
 ): Promise<void> => {
-	const url = `${ADK_API_BASE_URL}/apps/${appName}/users/${userId}/sessions/${sessionId}`;
+	const url = `${baseUrl}/apps/${appName}/users/${userId}/sessions/${sessionId}`;
 	const headers = { 'Content-Type': 'application/json' };
 
 	logger.info({ url }, 'Creating ADK Session');
@@ -46,7 +42,7 @@ export const invokeAdkAgent = async (
 	sessionId: string,
 	userMessage: string
 ): Promise<AdkAgentResponse> => {
-	const url = `${ADK_API_BASE_URL}/run`;
+	const url = `${baseUrl}/run`;
 
 	const headers = {
 		'Content-Type': 'application/json'
