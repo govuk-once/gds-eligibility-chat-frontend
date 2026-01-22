@@ -1,5 +1,5 @@
 import { logger } from '../utils/logger.js';
-import { PUBLIC_ADK_API_URL } from '$env/static/public';
+import { PUBLIC_ADK_API_URL } from '$env/dynamic/public';
 import { handleFetchError } from '$lib/utils/handle-fetch-error.js';
 import type { AdkAgentResponse } from './adk-types.js';
 

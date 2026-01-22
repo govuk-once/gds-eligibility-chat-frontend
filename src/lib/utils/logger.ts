@@ -1,5 +1,5 @@
 import { pino } from 'pino';
-import { PINO_LOG_LEVEL } from '$env/static/private';
+import { PINO_LOG_LEVEL } from '$env/dynamic/private';
 import { dev } from '$app/environment';
 
 export const logger = pino({

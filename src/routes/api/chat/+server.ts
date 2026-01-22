@@ -1,6 +1,6 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { invokeAdkAgent, createAdkSession } from '$lib/google-adk/adk-client.js';
-import { ADK_APP_NAME, ADK_USER_ID } from '$env/static/private';
+import { ADK_APP_NAME, ADK_USER_ID } from '$env/dynamic/private';
 import { logger } from '$lib/utils/logger.js';
 
 export const POST: RequestHandler = async ({ request }) => {
