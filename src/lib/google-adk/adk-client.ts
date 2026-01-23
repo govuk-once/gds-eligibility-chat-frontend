@@ -1,9 +1,9 @@
 import { logger } from '../utils/logger.js';
-import { env } from '$env/dynamic/private';
+import { env } from '$env/dynamic/public';
 import { handleFetchError } from '$lib/utils/handle-fetch-error.js';
 import type { AdkAgentResponse } from './adk-types.js';
 
-const baseUrl = env.ADK_API_URL
+const baseUrl = env.PUBLIC_ADK_API_URL
 
 export const createAdkSession = async (
 	appName: string,
