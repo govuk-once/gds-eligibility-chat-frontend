@@ -3,7 +3,7 @@ import { env } from '$env/dynamic/private';
 import { handleFetchError } from '$lib/utils/handle-fetch-error.js';
 import type { AdkAgentResponse } from './adk-types.js';
 
-const baseUrl = env.PUBLIC_ADK_API_URL ?? 'http://127.0.0.1:8001'
+const baseUrl = env.PUBLIC_ADK_API_URL
 
 export const createAdkSession = async (
 	appName: string,

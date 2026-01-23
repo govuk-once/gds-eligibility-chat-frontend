@@ -9,12 +9,12 @@ export const POST: RequestHandler = async ({ request }) => {
 	const sessionId = data.sessionId;
 	const isFirstMessage = data.is_first_message;
 
-	const appName = env.ADK_APP_NAME ?? 'sequential_agent';
-	const userId = env.ADK_USER_ID ?? 'user';
+	const appName = env.ADK_APP_NAME
+	const userId = env.ADK_USER_ID
 
-	// if (!appName || !userId) {
-	// 	throw new Error('ADK_APP_NAME and ADK_USER_ID must be set in environment variables.');
-	// }
+	if (!appName || !userId) {
+		throw new Error('ADK_APP_NAME and ADK_USER_ID must be set in environment variables.');
+	}
 
 	if (!sessionId) {
 		throw new Error('Session ID is required.');
