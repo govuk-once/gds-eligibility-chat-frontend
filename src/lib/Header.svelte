@@ -25,7 +25,8 @@
 
 <style>
 	header {
-		height: 6.625em;
+		/* height: 6.625em; */
+		height: 3.5em;
         display: flex;
         justify-content: flex-end;
         align-items: flex-end;
