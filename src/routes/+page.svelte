@@ -6,7 +6,6 @@
 	import { chatState, sendMessage } from '$lib/chat.svelte';
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
 	import { device, initDeviceListeners } from '$lib/device.svelte';
-	import { onMount, onDestroy } from 'svelte';
 
 	let chatInputBoxComponent: ChatInputBox;
 	let chatWindowEl: HTMLDivElement;
@@ -14,19 +13,21 @@
 	initDeviceListeners();
 
 	let thinkingText = $state('Thinking');
-	let interval: NodeJS.Timeout;
 
-	onMount(() => {
-		interval = setInterval(() => {
-			thinkingText += '.';
-			if (thinkingText.length > 'Thinking...'.length) {
+	$effect(() => {
+		if (chatState.loading) {
+			const interval = setInterval(() => {
+				thinkingText += '.';
+				if (thinkingText.length > 'Thinking...'.length) {
+					thinkingText = 'Thinking';
+				}
+			}, 350);
+
+			return () => {
+				clearInterval(interval);
 				thinkingText = 'Thinking';
-			}
-		}, 350);
-	});
-
-	onDestroy(() => {
-		clearInterval(interval);
+			};
+		}
 	});
 
 	// Attachment to handle resizing when the virtual keyboard appears on mobile
