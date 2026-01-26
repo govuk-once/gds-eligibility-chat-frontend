@@ -28,7 +28,7 @@ export function extractFinalModelResponse(resData: Event[]): ElicitationResponse
 					content?: string;
 					source?: string;
 					reply_type?: string;
-					actions?: any[];
+					actions?: Action[];
 				};
 
 				// Narrow source to allowed union

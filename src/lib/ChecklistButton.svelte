@@ -18,7 +18,7 @@
 
 <div class="checklist-component">
 	<div class="checklist-group">
-		{#each actions as action}
+		{#each actions as action (action.payload)}
 			<div>
 				<label class="checklist-label">
 					{action.label}

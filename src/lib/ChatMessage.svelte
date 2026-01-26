@@ -6,6 +6,7 @@
 	import UserAgentMessageInput from './UserAgentMessageInput.svelte';
 	import BenefitAgentMessageInput from './BenefitAgentMessageInput.svelte';
 	import Button from '$lib/Button.svelte';
+	import { SvelteSet } from 'svelte/reactivity'
 
 	let { message, isLast, loading, onUpdate } = $props<{
 		message: Message;
@@ -15,7 +16,7 @@
 	}>();
 
 	let displayedActions = $state<Action[]>([]);
-	const timeouts = new Set<NodeJS.Timeout>();
+	const timeouts = new SvelteSet<NodeJS.Timeout>();
 
 	$effect.pre(() => {
 		// This cleanup function runs before the main effect,
@@ -31,7 +32,7 @@
 	$effect(() => {
 		// When the message prop itself changes, this effect re-runs.
 		// The cleanup function from $effect.pre ensures we start fresh.
-		const _ = message.id; // Establish dependency on the message ID
+		void message.id; // Establish dependency on the message ID
 		displayedActions = [];
 
 		// Schedule the animations for the new message

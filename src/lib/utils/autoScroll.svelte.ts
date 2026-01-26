@@ -6,12 +6,12 @@ export function autoScroll(node: HTMLElement) {
 
 		if (lastMessage) {
 			// Depend on all properties that can affect the final height
-			const _html = lastMessage.html;
-			const _streaming = lastMessage.streaming;
-			const _actions = lastMessage.actions?.length;
+			void lastMessage.html;
+			void lastMessage.streaming;
+			void lastMessage.actions?.length;
 
 			// Also depend on the total number of messages
-			const _messageCount = chatState.messages.length;
+			void chatState.messages.length;
 
 			// Using requestAnimationFrame can be smoother for scrolling
 			// as it waits for the next browser repaint.

@@ -18,7 +18,7 @@
 
 <div class="radio-component">
 	<div class="radio-group">
-		{#each actions as action}
+		{#each actions as action (action.payload)}
 			<div>
 				<label class="radio-label">
 					<input
