@@ -4,14 +4,13 @@ export type Action = {
 };
 
 export type Message = {
-
 	id: string;
 
 	role: 'user' | 'assistant' | 'error';
 
 	source?: 'user_agent' | 'benefit_agent';
 
-	reply_type?: "yes_no" | "choice_multiple" | "choice_single" | "free_text" | "none";
+	reply_type?: 'yes_no' | 'choice_multiple' | 'choice_single' | 'free_text' | 'none';
 
 	text?: string;
 
@@ -21,10 +20,7 @@ export type Message = {
 
 	actions?: Action[];
 
-		streaming?: boolean;
+	streaming?: boolean;
 
-		vault?: boolean;
-
-	};
-
-	
+	vault?: boolean;
+};

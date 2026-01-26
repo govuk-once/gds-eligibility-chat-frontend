@@ -21,7 +21,12 @@
 		{#each actions as action}
 			<div>
 				<label class="radio-label">
-					<input type="radio" name="dynamic-radio-group" bind:group={selectedValue} value={action.payload} />
+					<input
+						type="radio"
+						name="dynamic-radio-group"
+						bind:group={selectedValue}
+						value={action.payload}
+					/>
 					<span class="radio-custom"></span>
 					{action.label}
 				</label>
@@ -50,7 +55,8 @@
 		margin-bottom: 0.5em;
 	}
 
-	.radio-group > div { /* Target the div wrapping each label */
+	.radio-group > div {
+		/* Target the div wrapping each label */
 		height: 2.75em; /* Standardized height */
 		display: flex; /* To vertically center the label content */
 		align-items: center; /* Vertically center the label */
@@ -66,7 +72,7 @@
 		padding-left: 1.75em;
 		gap: 0.75em;
 		width: 100%; /* Ensure label takes full width within its div */
-        height: 100%; /* Take full height of its parent div */
+		height: 100%; /* Take full height of its parent div */
 	}
 
 	.radio-label input[type='radio'] {
@@ -80,7 +86,7 @@
 		border-radius: 50%;
 		display: inline-block;
 		position: relative;
-		border: 2px solid black; 
+		border: 2px solid black;
 		flex-shrink: 0;
 	}
 

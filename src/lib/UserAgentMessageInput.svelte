@@ -28,7 +28,6 @@
 	{/if}
 </div>
 
-
 <style>
 	.actions {
 		margin-top: 1em;

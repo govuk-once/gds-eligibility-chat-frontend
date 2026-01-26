@@ -1,21 +1,23 @@
 import type { Message } from '$lib/types';
 import { markdownToHtml } from '$lib/utils/markdown-to-html';
 import { parseUserAgentMultipleChoice } from '$lib/utils/parse-user-agent-multiple-choice';
-import { extractFinalModelResponse, type ElicitationResponse } from './utils/extract-final-model-response';
+import {
+	extractFinalModelResponse,
+	type ElicitationResponse
+} from './utils/extract-final-model-response';
 
 export const chatState = $state({
 	messages: [
 		{
 			id: crypto.randomUUID(),
 			role: 'assistant',
-			html: '<p><b>Hi!</b> How can I help you today?</p>',
+			html: '<p><b>Hi!</b> How can I help you today?</p>'
 		}
 	] as Message[],
 	input: '',
 	loading: false,
 	sessionId: undefined as string | undefined
 });
-
 
 async function postMessageAndHandleResponse(message: string, isFirstMessage: boolean) {
 	chatState.loading = true;
@@ -45,25 +47,27 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 
 		const resData = await res.json();
 		const finalResponse: ElicitationResponse = extractFinalModelResponse(resData);
-	
-// 	const finalResponse = {
-//     content: "Do you live in the United Kingdom?",
-//     source: "benefit_agent",
-//     reply_type: "yes_no",
-//     actions: [
-//         {
-//             label: "Yes",
-//             payload: "Yes"
-//         },
-//         {
-//             label: "No",
-//             payload: "No"
-//         }
-//     ]
-// }
 
-	
-	const fullResponseMarkdown = (finalResponse.source === "user_agent" && finalResponse.reply_type === 'choice_multiple') ? parseUserAgentMultipleChoice(finalResponse) : finalResponse.content;
+		// 	const finalResponse = {
+		//     content: "Do you live in the United Kingdom?",
+		//     source: "benefit_agent",
+		//     reply_type: "yes_no",
+		//     actions: [
+		//         {
+		//             label: "Yes",
+		//             payload: "Yes"
+		//         },
+		//         {
+		//             label: "No",
+		//             payload: "No"
+		//         }
+		//     ]
+		// }
+
+		const fullResponseMarkdown =
+			finalResponse.source === 'user_agent' && finalResponse.reply_type === 'choice_multiple'
+				? parseUserAgentMultipleChoice(finalResponse)
+				: finalResponse.content;
 		const actions = finalResponse.actions;
 		const source = finalResponse.source;
 		const reply_type = finalResponse.reply_type;
@@ -103,19 +107,18 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 export function finishedStreaming(messageId: string) {
 	const message = chatState.messages.find((m) => m.id === messageId);
 	if (message) {
-		message.streaming = false;	
+		message.streaming = false;
 	}
 }
 
-
 function disablePreviousMessageActions() {
-    if (chatState.messages.length > 0) {
-        const lastMessage = chatState.messages.at(-1); // Get the last message in the chat
-        if (lastMessage && lastMessage.role === 'assistant' && lastMessage.actions) {
-            // Check if it's an assistant message with actions
-            lastMessage.actions = []; // Clear the actions
-        }
-    }
+	if (chatState.messages.length > 0) {
+		const lastMessage = chatState.messages.at(-1); // Get the last message in the chat
+		if (lastMessage && lastMessage.role === 'assistant' && lastMessage.actions) {
+			// Check if it's an assistant message with actions
+			lastMessage.actions = []; // Clear the actions
+		}
+	}
 }
 
 function shouldVault(): boolean {
@@ -128,13 +131,17 @@ export async function sendPayload(payload: string) {
 		return;
 	}
 	// Disable actions on the previous message
-    disablePreviousMessageActions();
+	disablePreviousMessageActions();
 	// Add user message for context
-	chatState.messages.push({ id: crypto.randomUUID(), role: 'user', text: payload, vault: shouldVault() });
+	chatState.messages.push({
+		id: crypto.randomUUID(),
+		role: 'user',
+		text: payload,
+		vault: shouldVault()
+	});
 
 	await postMessageAndHandleResponse(payload, false);
 }
-
 
 export async function sendMessage() {
 	const currentInput = chatState.input.trim();
@@ -142,9 +149,14 @@ export async function sendMessage() {
 		return;
 	}
 
-    // Disable actions on the previous message
-    disablePreviousMessageActions();
-	chatState.messages.push({ id: crypto.randomUUID(), role: 'user', text: currentInput, vault: shouldVault() });
+	// Disable actions on the previous message
+	disablePreviousMessageActions();
+	chatState.messages.push({
+		id: crypto.randomUUID(),
+		role: 'user',
+		text: currentInput,
+		vault: shouldVault()
+	});
 	chatState.input = '';
 
 	const isFirstMessage = !chatState.sessionId;

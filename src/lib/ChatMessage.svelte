@@ -59,12 +59,7 @@
 	<div class="message-content">
 		{#if message.html}
 			{#if message.role === 'assistant' && isLast && !loading && message.markdown}
-				<StreamingText
-					messageId={message.id}
-					content={message.markdown}
-					stream={true}
-					{onUpdate}
-				/>
+				<StreamingText messageId={message.id} content={message.markdown} stream={true} {onUpdate} />
 			{:else}
 				<!-- we have sanitised message.html with DOMPurify -->
 				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -162,9 +157,9 @@
 		flex-direction: column;
 		gap: 0.5em;
 	}
-	.shield-icon{
+	.shield-icon {
 		display: flex;
-		align-items: flex-end;   /* bottom */
+		align-items: flex-end; /* bottom */
 		justify-content: flex-end; /* right */
 		align-self: flex-end;
 	}

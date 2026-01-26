@@ -11,7 +11,7 @@
 
 <div class="double-button-container">
 	<Button onclick={onYesClick} label={yesLabel} />
-	<Button onclick={onNoClick} label={noLabel}  color='#8B8888'/>
+	<Button onclick={onNoClick} label={noLabel} color="#8B8888" />
 </div>
 
 <style>

@@ -51,7 +51,8 @@
 		margin-top: 0.5em;
 	}
 
-	.checklist-group > div { /* Target the div wrapping each label */
+	.checklist-group > div {
+		/* Target the div wrapping each label */
 		height: 2.75em; /* Standardized height */
 		display: flex; /* To vertically center the label content */
 		align-items: center; /* Vertically center the label */
@@ -66,7 +67,7 @@
 		cursor: pointer;
 		font-size: 1em;
 		width: 100%; /* Ensure label takes full width within its div */
-        height: 100%; /* Take full height of its parent div */
+		height: 100%; /* Take full height of its parent div */
 		padding-right: 0.75em;
 		padding-left: 1.25em;
 	}

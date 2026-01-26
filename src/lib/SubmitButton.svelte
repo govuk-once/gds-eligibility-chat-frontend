@@ -17,12 +17,7 @@
 
 	<div class="privacy-note">
 		Stored in your private data vault
-		<img
-		src="/icons/shield-check.svg"
-		alt=""
-		aria-hidden="true"
-		class="privacy-icon"
-		/>
+		<img src="/icons/shield-check.svg" alt="" aria-hidden="true" class="privacy-icon" />
 	</div>
 </div>
 
@@ -50,7 +45,7 @@
 	.privacy-note {
 		margin-top: 0.5em;
 		font-size: 1em;
-		color: #AAAAAA;
+		color: #aaaaaa;
 		display: inline-flex;
 		align-items: center;
 		justify-content: flex-end;

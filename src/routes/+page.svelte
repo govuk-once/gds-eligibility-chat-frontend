@@ -72,17 +72,21 @@
 	<Header />
 	<div class="chat-container">
 		<div class="chat-window" use:autoScroll bind:this={chatWindowEl}>
-			      {#each chatState.messages as m, i (m.id)}
-			        <ChatMessage
-								message={m}
-								isLast={i === chatState.messages.length - 1}
-								loading={chatState.loading}
-								onUpdate={handleStreamUpdate}
-							/>
-			      {/each}
+			{#each chatState.messages as m, i (m.id)}
+				<ChatMessage
+					message={m}
+					isLast={i === chatState.messages.length - 1}
+					loading={chatState.loading}
+					onUpdate={handleStreamUpdate}
+				/>
+			{/each}
 			{#if chatState.loading}
 				<ChatMessage
-					message={{ id: 'loading-indicator', role: 'assistant', html: '<p>' + thinkingText + '</p>' }}
+					message={{
+						id: 'loading-indicator',
+						role: 'assistant',
+						html: '<p>' + thinkingText + '</p>'
+					}}
 					isLast={true}
 					loading={chatState.loading}
 				/>
@@ -143,4 +147,3 @@
 		flex-shrink: 0;
 	}
 </style>
-

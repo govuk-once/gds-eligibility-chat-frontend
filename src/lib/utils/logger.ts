@@ -2,7 +2,7 @@ import { pino } from 'pino';
 import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
 
-const level = env.PINO_LOG_LEVEL || 'info'
+const level = env.PINO_LOG_LEVEL || 'info';
 
 export const logger = pino({
 	level,

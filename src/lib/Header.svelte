@@ -1,44 +1,38 @@
 <script lang="ts">
-    import { chatState } from '$lib/chat.svelte';
+	import { chatState } from '$lib/chat.svelte';
 
-    const vaultCount = $derived(chatState.messages.filter(m => m.vault).length);
+	const vaultCount = $derived(chatState.messages.filter((m) => m.vault).length);
 </script>
 
 <header>
-    <div class="vault-container">
+	<div class="vault-container">
 		<div class="shield-container">
-			<img
-				src="/icons/shield-check.svg"
-				alt="vault icon"
-				aria-hidden="true"
-				class="privacy-icon"
-			/>
-        </div>
+			<img src="/icons/shield-check.svg" alt="vault icon" aria-hidden="true" class="privacy-icon" />
+		</div>
 		{#if vaultCount > 0}
 			<div class="notification-dot">
 				<span>{vaultCount}</span>
 			</div>
 		{/if}
-    </div>
-    
+	</div>
 </header>
 
 <style>
 	header {
 		/* height: 6.625em; */
 		height: 3.5em;
-        display: flex;
-        justify-content: flex-end;
-        align-items: flex-end;
-        padding: 0 1.5em;
+		display: flex;
+		justify-content: flex-end;
+		align-items: flex-end;
+		padding: 0 1.5em;
 	}
 
-    .vault-container {
+	.vault-container {
 		position: relative;
-        display: flex;
-        align-items: center;
-        gap: 0.5em;
-    }
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
 
 	.privacy-icon {
 		width: 1.4em;
