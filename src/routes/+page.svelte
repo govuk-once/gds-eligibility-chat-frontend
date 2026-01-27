@@ -6,6 +6,7 @@
 	import { chatState, sendMessage } from '$lib/chat.svelte';
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
 	import { device, initDeviceListeners } from '$lib/device.svelte';
+	import { virtualViewportSizer } from '$lib/utils/virtualViewportSizer.svelte';
 
 	let chatInputBoxComponent: ChatInputBox;
 	let chatWindowEl: HTMLDivElement;
@@ -30,26 +31,6 @@
 		}
 	});
 
-	// Attachment to handle resizing when the virtual keyboard appears on mobile
-	function virtualViewportSizer(node: HTMLDivElement) {
-		if (typeof window === 'undefined' || !window.visualViewport) return;
-
-		const viewport = window.visualViewport;
-
-		const handleResize = () => {
-			node.style.height = `${viewport.height}px`;
-		};
-
-		handleResize();
-
-		viewport.addEventListener('resize', handleResize);
-
-		// Cleanup function to remove the listener when the component is destroyed
-		return () => {
-			viewport.removeEventListener('resize', handleResize);
-		};
-	}
-
 	async function handleSend() {
 		await sendMessage();
 		if (chatInputBoxComponent && !device.isMobile) {
@@ -69,7 +50,7 @@
 	}
 </script>
 
-<div class="page-container" {@attach virtualViewportSizer}>
+<div class="page-container" use:virtualViewportSizer>
 	<Header />
 	<div class="chat-container">
 		<div class="chat-window" use:autoScroll bind:this={chatWindowEl}>
