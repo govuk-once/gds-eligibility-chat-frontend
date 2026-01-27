@@ -1,12 +1,11 @@
 <script lang="ts">
 	import type { Message, Action } from '$lib/types';
-	import { sendPayload } from '$lib/chat.svelte';
 	import StreamingText from '$lib/components/StreamingText.svelte';
 	import { getRandomDelay } from '$lib/utils/random-delay';
-	import UserAgentMessageInput from '$lib/components/UserAgentMessageInput.svelte';
-	import BenefitAgentMessageInput from '$lib/components/BenefitAgentMessageInput.svelte';
-	import Button from '$lib/components/Button.svelte';
-	import { SvelteSet } from 'svelte/reactivity'
+	import UserAgentMessageActions from '$lib/components/actions/UserAgentMessageActions.svelte';
+	import BenefitAgentMessageActions from '$lib/components/actions/BenefitAgentMessageActions.svelte';
+	import DefaultMessageActions from '$lib/components/actions/DefaultMessageActions.svelte';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	let { message, isLast, loading, onUpdate } = $props<{
 		message: Message;
@@ -84,15 +83,11 @@
 
 	{#if displayedActions.length > 0}
 		{#if message.source === 'user_agent'}
-			<UserAgentMessageInput {message} {displayedActions} />
+			<UserAgentMessageActions {message} {displayedActions} />
 		{:else if message.source === 'benefit_agent'}
-			<BenefitAgentMessageInput {message} {displayedActions} />
+			<BenefitAgentMessageActions {message} {displayedActions} />
 		{:else}
-			<div class="actions">
-				{#each displayedActions as action (action.label)}
-					<Button onclick={() => sendPayload(action.payload)} label={action.label} />
-				{/each}
-			</div>
+			<DefaultMessageActions {displayedActions} />
 		{/if}
 	{/if}
 </div>

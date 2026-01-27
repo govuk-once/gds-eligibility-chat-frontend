@@ -48,22 +48,6 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 		const resData = await res.json();
 		const finalResponse: ElicitationResponse = extractFinalModelResponse(resData);
 
-		// 	const finalResponse = {
-		//     content: "Do you live in the United Kingdom?",
-		//     source: "benefit_agent",
-		//     reply_type: "yes_no",
-		//     actions: [
-		//         {
-		//             label: "Yes",
-		//             payload: "Yes"
-		//         },
-		//         {
-		//             label: "No",
-		//             payload: "No"
-		//         }
-		//     ]
-		// }
-
 		const fullResponseMarkdown =
 			finalResponse.source === 'user_agent' && finalResponse.reply_type === 'choice_multiple'
 				? parseUserAgentMultipleChoice(finalResponse)

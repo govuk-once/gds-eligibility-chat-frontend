@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Action } from '$lib/types';
 	import { sendPayload } from '$lib/chat.svelte';
-	import SubmitButton from '$lib/components/SubmitButton.svelte';
+	import SubmitButton from '$lib/components/buttons/SubmitButton.svelte';
 
 	let { actions } = $props<{
 		actions: Action[];
