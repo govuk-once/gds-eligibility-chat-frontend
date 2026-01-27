@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type { Message, Action } from '$lib/types';
 	import { sendPayload } from '$lib/chat.svelte';
-	import StreamingText from './StreamingText.svelte';
+	import StreamingText from '$lib/components/StreamingText.svelte';
 	import { getRandomDelay } from '$lib/utils/random-delay';
-	import UserAgentMessageInput from './UserAgentMessageInput.svelte';
-	import BenefitAgentMessageInput from './BenefitAgentMessageInput.svelte';
-	import Button from '$lib/Button.svelte';
+	import UserAgentMessageInput from '$lib/components/UserAgentMessageInput.svelte';
+	import BenefitAgentMessageInput from '$lib/components/BenefitAgentMessageInput.svelte';
+	import Button from '$lib/components/Button.svelte';
 	import { SvelteSet } from 'svelte/reactivity'
 
 	let { message, isLast, loading, onUpdate } = $props<{

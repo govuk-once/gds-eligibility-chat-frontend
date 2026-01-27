@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Message, Action } from '$lib/types';
 	import { sendPayload } from '$lib/chat.svelte';
-	import Button from '$lib/Button.svelte';
-	import DoubleButton from '$lib/DoubleButton.svelte';
+	import Button from '$lib/components/Button.svelte';
+	import DoubleButton from '$lib/components/DoubleButton.svelte';
 
 	let { message, displayedActions } = $props<{
 		message: Message;

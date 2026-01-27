@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { markdownToHtml } from './utils/markdown-to-html';
-	import { finishedStreaming } from './chat.svelte';
+	import { markdownToHtml } from '$lib/utils/markdown-to-html';
+	import { finishedStreaming } from '$lib/chat.svelte';
 	import { getRandomDelay } from '$lib/utils/random-delay';
 
 	export let content: string;

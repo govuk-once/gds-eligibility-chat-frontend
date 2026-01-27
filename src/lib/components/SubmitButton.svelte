@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/Button.svelte';
+	import Button from '$lib/components/Button.svelte';
 
 	type Props = {
 		disabled?: boolean;

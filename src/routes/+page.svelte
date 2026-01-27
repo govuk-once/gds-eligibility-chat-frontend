@@ -1,8 +1,8 @@
 <script lang="ts">
-	import Header from '$lib/Header.svelte';
-	import Footer from '$lib/Footer.svelte';
-	import ChatInputBox from '$lib/ChatInputBox.svelte';
-	import ChatMessage from '$lib/ChatMessage.svelte';
+	import Header from '$lib/components/Header.svelte';
+	import Footer from '$lib/components/Footer.svelte';
+	import ChatInputBox from '$lib/components/ChatInputBox.svelte';
+	import ChatMessage from '$lib/components/ChatMessage.svelte';
 	import { chatState, sendMessage } from '$lib/chat.svelte';
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
 	import { device, initDeviceListeners } from '$lib/device.svelte';
