@@ -7,6 +7,7 @@
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
 	import { device, initDeviceListeners } from '$lib/device.svelte';
 	import { virtualViewportSizer } from '$lib/utils/virtualViewportSizer.svelte';
+	import { tick } from 'svelte';
 
 	let chatInputBoxComponent: ChatInputBox;
 	let chatWindowEl: HTMLDivElement;
@@ -34,9 +35,8 @@
 	async function handleSend() {
 		await sendMessage();
 		if (chatInputBoxComponent && !device.isMobile) {
-			setTimeout(() => {
-				chatInputBoxComponent.focusInput();
-			}, 0);
+			await tick();
+			chatInputBoxComponent.focusInput();
 		}
 	}
 	function handleStreamUpdate() {
