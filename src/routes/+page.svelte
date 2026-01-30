@@ -1,57 +1,76 @@
 <script lang="ts">
-	import Header from '$lib/Header.svelte';
-	import Footer from '$lib/Footer.svelte';
-	import ChatInputBox from '$lib/ChatInputBox.svelte';
-	import ChatMessage from '$lib/ChatMessage.svelte';
+	import Header from '$lib/components/Header.svelte';
+	import Footer from '$lib/components/Footer.svelte';
+	import ChatInputBox from '$lib/components/ChatInputBox.svelte';
+	import ChatMessage from '$lib/components/ChatMessage.svelte';
 	import { chatState, sendMessage } from '$lib/chat.svelte';
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
 	import { device, initDeviceListeners } from '$lib/device.svelte';
+	import { virtualViewportSizer } from '$lib/utils/virtualViewportSizer.svelte';
+	import { tick } from 'svelte';
 
 	let chatInputBoxComponent: ChatInputBox;
+	let chatWindowEl: HTMLDivElement;
 
 	initDeviceListeners();
 
-	// Attachment to handle resizing when the virtual keyboard appears on mobile
-	function virtualViewportSizer(node: HTMLDivElement) {
-		if (typeof window === 'undefined' || !window.visualViewport) return;
+	let thinkingText = $state('Thinking');
 
-		const viewport = window.visualViewport;
+	$effect(() => {
+		if (chatState.loading) {
+			const interval = setInterval(() => {
+				thinkingText += '.';
+				if (thinkingText.length > 'Thinking...'.length) {
+					thinkingText = 'Thinking';
+				}
+			}, 350);
 
-		const handleResize = () => {
-			node.style.height = `${viewport.height}px`;
-		};
-
-		handleResize();
-
-		viewport.addEventListener('resize', handleResize);
-
-		// Cleanup function to remove the listener when the component is destroyed
-		return () => {
-			viewport.removeEventListener('resize', handleResize);
-		};
-	}
+			return () => {
+				clearInterval(interval);
+				thinkingText = 'Thinking';
+			};
+		}
+	});
 
 	async function handleSend() {
 		await sendMessage();
 		if (chatInputBoxComponent && !device.isMobile) {
-			setTimeout(() => {
-				chatInputBoxComponent.focusInput();
-			}, 0);
+			await tick();
+			chatInputBoxComponent.focusInput();
+		}
+	}
+	function handleStreamUpdate() {
+		if (chatWindowEl) {
+			// Wait for the next frame to allow the DOM to update
+			// before we measure the new scrollHeight.
+			requestAnimationFrame(() => {
+				chatWindowEl.scrollTop = chatWindowEl.scrollHeight;
+			});
 		}
 	}
 </script>
 
-<div class="page-container" {@attach virtualViewportSizer}>
+<div class="page-container" use:virtualViewportSizer>
 	<Header />
 	<div class="chat-container">
-		<div class="chat-window" {@attach autoScroll}>
-			{#each chatState.messages as m (m.id)}
-				<ChatMessage message={m} />
+		<div class="chat-window" use:autoScroll bind:this={chatWindowEl}>
+			{#each chatState.messages as m, i (m.id)}
+				<ChatMessage
+					message={m}
+					isLast={i === chatState.messages.length - 1}
+					loading={chatState.loading}
+					onUpdate={handleStreamUpdate}
+				/>
 			{/each}
-
 			{#if chatState.loading}
 				<ChatMessage
-					message={{ id: 'loading-indicator', role: 'assistant', text: 'Thinking...' }}
+					message={{
+						id: 'loading-indicator',
+						role: 'assistant',
+						html: '<p>' + thinkingText + '</p>'
+					}}
+					isLast={true}
+					loading={chatState.loading}
 				/>
 			{/if}
 		</div>
@@ -60,7 +79,7 @@
 			bind:this={chatInputBoxComponent}
 			bind:value={chatState.input}
 			loading={chatState.loading}
-			placeholder="Ask me anything"
+			placeholder=""
 			onSend={handleSend}
 		/>
 	</div>
@@ -77,7 +96,8 @@
 		max-width: 800px;
 		width: 100%;
 		margin: 0 auto; /* Horizontal centering */
-		padding: 0 2em; /* Add 2em "margins" on each side visually */
+		padding: 0 1em;
+		background-color: #F5F5F5;
 		box-sizing: border-box; /* Include padding in the width calculation */
 		display: flex;
 		flex-direction: column;
@@ -88,20 +108,21 @@
 		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		/* gap: 1rem; */
 		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 		flex: 1;
 		min-height: 0;
 	}
 
 	.chat-window {
-		margin-top: 1.5em;
+		padding-top: 1.5em;
 		overflow-y: auto;
 		display: flex;
 		flex-direction: column;
-		gap: 1.5em;
+		gap: 1.5em; /* gap between items in chat window */
 		flex: 1; /* Grow to fill available space */
 		min-height: 0; /* Prevent flexbox overflow */
+		background-color: #F5F5F5;
 	}
 
 	.keyboard-collapsed-footer {
