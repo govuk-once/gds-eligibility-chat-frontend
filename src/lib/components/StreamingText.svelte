@@ -13,28 +13,37 @@
 	let htmlContent = '';
 	let intervalId: ReturnType<typeof setInterval> | undefined;
 
+	function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
+		let timeout: ReturnType<typeof setTimeout>;
+
+		return (...args: Parameters<T>) => {
+			clearTimeout(timeout);
+			timeout = setTimeout(() => fn(...args), delay);
+		};
+	}
+
 	async function updateHtml(markdown: string) {
 		htmlContent = await markdownToHtml(markdown);
-		if (onUpdate) {
-			onUpdate();
-		}
+		onUpdate?.();
 	}
+
+	const debouncedUpdateHtml = debounce(updateHtml, 80);
 
 	function startStreaming() {
 		if (intervalId) clearInterval(intervalId);
 
 		displayedContent = '';
-		const words = content.split(' ');
+		const words = content.split(/(\s+)/);
 		let i = 0;
-		const currentDelay = getRandomDelay(100, 180);
+		const currentDelay = getRandomDelay(120, 125);
 
 		intervalId = setInterval(() => {
-			const chunkSize = Math.floor(Math.random() * 2) + 2; // 2 or 3 words
+			const chunkSize = Math.floor(Math.random() * 2) + 5;
 			const chunk = words.slice(i, i + chunkSize).join(' ');
 
 			if (chunk) {
 				displayedContent += (i > 0 ? ' ' : '') + chunk;
-				updateHtml(displayedContent);
+				debouncedUpdateHtml(displayedContent);
 			}
 
 			i += chunkSize;
@@ -61,7 +70,6 @@
 	}
 
 	onMount(() => {
-		// Initial render
 		updateHtml(stream ? displayedContent : content);
 
 		return () => {

@@ -1,7 +1,7 @@
 import showdown from 'showdown';
 import DOMPurify from 'dompurify';
 
-const converter = new showdown.Converter();
+const converter = new showdown.Converter({ simpleLineBreaks: true });
 
 export async function markdownToHtml(markdown: string): Promise<string> {
 	const unsafeHtml = converter.makeHtml(markdown);
