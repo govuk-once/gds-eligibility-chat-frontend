@@ -96,7 +96,8 @@
 		max-width: 800px;
 		width: 100%;
 		margin: 0 auto; /* Horizontal centering */
-		/* padding: 0 2em; */
+		padding: 0 1em;
+		background-color: #F5F5F5;
 		box-sizing: border-box; /* Include padding in the width calculation */
 		display: flex;
 		flex-direction: column;
@@ -114,13 +115,14 @@
 	}
 
 	.chat-window {
-		margin-top: 1.5em;
+		padding-top: 1.5em;
 		overflow-y: auto;
 		display: flex;
 		flex-direction: column;
 		gap: 1.5em; /* gap between items in chat window */
 		flex: 1; /* Grow to fill available space */
 		min-height: 0; /* Prevent flexbox overflow */
+		background-color: #F5F5F5;
 	}
 
 	.keyboard-collapsed-footer {

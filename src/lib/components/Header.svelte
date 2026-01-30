@@ -24,7 +24,8 @@
 		display: flex;
 		justify-content: flex-end;
 		align-items: flex-end;
-		padding: 0 1.5em;
+		padding: 0 0.5em;
+		background-color: #F5F5F5;
 	}
 
 	.vault-container {
