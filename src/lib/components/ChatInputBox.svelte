@@ -44,7 +44,7 @@
 	.chat-input-wrapper {
 		padding: 1.5em 2em;
 		height: 2.75em;
-		background-color: #F5F5F5;
+		background-color: #f5f5f5;
 	}
 
 	.chat-input-box {

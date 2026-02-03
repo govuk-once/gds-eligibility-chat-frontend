@@ -25,7 +25,7 @@
 		justify-content: flex-end;
 		align-items: flex-end;
 		padding: 0 0.5em;
-		background-color: #F5F5F5;
+		background-color: #f5f5f5;
 	}
 
 	.vault-container {

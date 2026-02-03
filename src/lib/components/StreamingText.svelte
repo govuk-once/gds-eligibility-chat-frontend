@@ -13,7 +13,7 @@
 	let htmlContent = '';
 	let intervalId: ReturnType<typeof setInterval> | undefined;
 
-	function debounce<T extends (...args: any[]) => void>(fn: T, delay: number) {
+	function debounce<T extends (...args: [string]) => void>(fn: T, delay: number) {
 		let timeout: ReturnType<typeof setTimeout>;
 
 		return (...args: Parameters<T>) => {
