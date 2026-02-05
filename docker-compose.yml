@@ -5,9 +5,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      image: 173331852279.dkr.ecr.eu-west-2.amazonaws.com/gds-eligability-frontend-repo
-      platform: linux/amd64
-      container_name: eligibility-chat-container
+    # Staging ECR:
+    # image: 173331852279.dkr.ecr.eu-west-2.amazonaws.com/gds-eligability-frontend-repo
+    # Dev ECR:
+    image: 453624448465.dkr.ecr.eu-west-2.amazonaws.com/gds-eligability-frontend-repo
+    platform: linux/amd64
+    container_name: eligibility-chat-container
     ports:
       - '3000:3000'
     environment:
