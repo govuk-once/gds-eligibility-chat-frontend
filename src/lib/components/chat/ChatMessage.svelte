@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Message, Action } from '$lib/types';
-	import StreamingText from '$lib/components/StreamingText.svelte';
+	import StreamingText from '$lib/components/chat/StreamingText.svelte';
 	import { getRandomDelay } from '$lib/utils/random-delay';
 	import UserAgentMessageActions from '$lib/components/actions/UserAgentMessageActions.svelte';
 	import BenefitAgentMessageActions from '$lib/components/actions/BenefitAgentMessageActions.svelte';
