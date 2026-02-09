@@ -5,7 +5,9 @@
 </script>
 
 <div class="app-container" use:virtualViewportSizer>
-	<ChatShell footerClass={device.isKeyboardCollapsed ? 'keyboard-collapsed-footer' : 'mobile-footer'} />
+	<ChatShell
+		footerClass={device.isKeyboardCollapsed ? 'keyboard-collapsed-footer' : 'mobile-footer'}
+	/>
 </div>
 
 <style>

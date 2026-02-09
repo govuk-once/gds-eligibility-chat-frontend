@@ -36,7 +36,13 @@
 			rows="1"
 		></textarea>
 	</div>
-	<button type="button" class="send-button" onclick={handleSend} disabled={loading} aria-label="Send message"><b>Send</b></button>
+	<button
+		type="button"
+		class="send-button"
+		onclick={handleSend}
+		disabled={loading}
+		aria-label="Send message"><b>Send</b></button
+	>
 </div>
 
 <style>
@@ -61,8 +67,7 @@
 		border-radius: 22px;
 		box-sizing: border-box;
 		/* max-width: 100%; */
-		max-width: calc(100% - 4.5em)
-
+		max-width: calc(100% - 4.5em);
 	}
 
 	.chat-input-box textarea {
@@ -79,7 +84,7 @@
 		max-height: 4em;
 		overflow-y: auto;
 		background-clip: padding-box;
-		max-width: 100%
+		max-width: 100%;
 	}
 
 	.chat-input-box textarea:focus {
