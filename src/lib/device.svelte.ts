@@ -1,6 +1,7 @@
 export const device = $state({
 	isMobile: false,
-	isKeyboardCollapsed: true
+	isKeyboardCollapsed: true,
+	forceMobileOverride: false, // local debugging property - default should be false
 });
 
 // This function must be called from within a component's setup phase
@@ -9,9 +10,18 @@ export function initDeviceListeners() {
 	$effect(() => {
 		// 1. Mobile detection
 		const mediaQuery = window.matchMedia('(pointer: coarse)');
-		const handleMediaQueryChange = (e: MediaQueryListEvent) => (device.isMobile = e.matches);
+		const handleMediaQueryChange = (e: MediaQueryListEvent) => {
+            if (!device.forceMobileOverride) {
+                device.isMobile = e.matches;
+            }
+        };
 		mediaQuery.addEventListener('change', handleMediaQueryChange);
-		device.isMobile = mediaQuery.matches; // set initial value
+
+        if (device.forceMobileOverride) {
+            device.isMobile = true;
+        } else {
+            device.isMobile = mediaQuery.matches;
+        }
 
 		// 2. Keyboard collapse detection
 		const viewport = window.visualViewport;
