@@ -2,6 +2,7 @@
 	import Header from '$lib/components/Header.svelte';
 	import ChatInputBox from '$lib/components/chat/ChatInputBox.svelte';
 	import ChatMessage from '$lib/components/chat/ChatMessage.svelte';
+	import ChatGradient from '$lib/components/chat/ChatGradient.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { chatState, sendMessage } from '$lib/chat.svelte';
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
@@ -46,7 +47,14 @@
 <Header />
 
 <div class="chat-container">
-	<div class="chat-window" use:autoScroll bind:this={chatWindowEl}>
+	<div class="chat-top-spacer"></div>
+
+	<div
+		class="chat-window"
+		use:autoScroll
+		bind:this={chatWindowEl}
+		class:hide-scrollbar={footerClass === 'keyboard-collapsed-footer'}
+	>
 		{#each chatState.messages as m, i (m.id)}
 			<ChatMessage
 				message={m}
@@ -67,6 +75,7 @@
 				loading
 			/>
 		{/if}
+		<ChatGradient />
 	</div>
 
 	<ChatInputBox
@@ -91,14 +100,27 @@
 		min-height: 0;
 	}
 
+	.chat-top-spacer {
+		height: 1.5em;
+		flex-shrink: 0;
+	}
+
 	.chat-window {
-		padding-top: 1.5em;
 		overflow-y: auto;
 		display: flex;
 		flex-direction: column;
 		gap: 1.5em; /* gap between items in chat window */
 		flex: 1; /* Grow to fill available space */
 		min-height: 0; /* Prevent flexbox overflow */
-		background-color: #f5f5f5;
+	}
+
+	/* Hide scrollbar but allow scrolling */
+	.chat-window.hide-scrollbar {
+		scrollbar-width: none; /* Firefox */
+		-ms-overflow-style: none; /* IE 10+ */
+	}
+
+	.chat-window.hide-scrollbar::-webkit-scrollbar {
+		display: none; /* Chrome, Safari, Edge */
 	}
 </style>
