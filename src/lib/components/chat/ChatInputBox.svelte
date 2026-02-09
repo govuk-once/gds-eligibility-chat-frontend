@@ -35,25 +35,27 @@
 			disabled={loading}
 			rows="1"
 		></textarea>
-		<button type="button" onclick={handleSend} disabled={loading} aria-label="Send message"
-		></button>
 	</div>
+	<button type="button" class="send-button" onclick={handleSend} disabled={loading} aria-label="Send message"></button>
 </div>
 
 <style>
 	.chat-input-wrapper {
-		padding: 1.5em 2em;
+		padding: 0 1em 1.5em 1em;
 		height: 2.75em;
 		background-color: #f5f5f5;
+		display: flex;
+		gap: 0.5rem; /* Space between input box and button */
+		align-items: center;
 	}
 
 	.chat-input-box {
 		position: relative;
+		flex: 1;
 		display: flex;
-		gap: 0.5rem;
 		align-items: center;
 		min-height: 2.75em;
-		padding: 0 2.75em 0 1.5em;
+		padding: 0 1em 0 1em;
 		border: 1px solid #aaaaaa;
 		background-color: white;
 		border-radius: 22px;
@@ -62,7 +64,6 @@
 	.chat-input-box textarea {
 		flex: 1;
 		padding: 0;
-		margin-right: 0.75em;
 		font-size: 1rem;
 		border: none;
 		border-top: 0.75em solid transparent;
@@ -80,12 +81,9 @@
 		outline: none;
 	}
 
-	.chat-input-box button {
-		position: absolute;
-		right: 0.5rem;
-		bottom: 0.375rem;
-		width: 2em;
-		height: 2em;
+	.send-button {
+		width: 2.75em;
+		height: 2.75em;
 		padding: 0;
 		display: flex;
 		justify-content: center;
@@ -99,7 +97,7 @@
 		flex-shrink: 0;
 	}
 
-	.chat-input-box button:disabled {
+	.send-button:disabled {
 		cursor: not-allowed;
 		opacity: 0.6;
 	}
