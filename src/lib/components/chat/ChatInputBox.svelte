@@ -36,13 +36,13 @@
 			rows="1"
 		></textarea>
 	</div>
-	<button type="button" class="send-button" onclick={handleSend} disabled={loading} aria-label="Send message"></button>
+	<button type="button" class="send-button" onclick={handleSend} disabled={loading} aria-label="Send message"><b>Send</b></button>
 </div>
 
 <style>
 	.chat-input-wrapper {
 		padding: 0 1em 1.5em 1em;
-		height: 2.75em;
+		/* height: 2.75em; Removed fixed height to allow expansion */
 		background-color: #f5f5f5;
 		display: flex;
 		gap: 0.5rem; /* Space between input box and button */
@@ -59,6 +59,10 @@
 		border: 1px solid #aaaaaa;
 		background-color: white;
 		border-radius: 22px;
+		box-sizing: border-box;
+		/* max-width: 100%; */
+		max-width: calc(100% - 4.5em)
+
 	}
 
 	.chat-input-box textarea {
@@ -75,6 +79,7 @@
 		max-height: 4em;
 		overflow-y: auto;
 		background-clip: padding-box;
+		max-width: 100%
 	}
 
 	.chat-input-box textarea:focus {
@@ -82,7 +87,7 @@
 	}
 
 	.send-button {
-		width: 2.75em;
+		width: 4em;
 		height: 2.75em;
 		padding: 0;
 		display: flex;
@@ -91,7 +96,7 @@
 		font-size: 1rem;
 		cursor: pointer;
 		border: none;
-		border-radius: 50%;
+		border-radius: 1em;
 		background-color: black;
 		color: white; /* For potential icon */
 		flex-shrink: 0;
