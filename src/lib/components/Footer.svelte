@@ -15,4 +15,8 @@
 		text-align: center;
 		flex-shrink: 0;
 	}
+
+	.mobile-footer {
+		height: 0em;
+	}
 </style>
