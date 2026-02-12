@@ -20,7 +20,6 @@
 		gap: 0.5em;
 		width: 100%;
 		box-sizing: border-box;
-		padding: 0 1em; /* optional padding instead of margin */
 	}
 
 	.double-button-container :global(button) {

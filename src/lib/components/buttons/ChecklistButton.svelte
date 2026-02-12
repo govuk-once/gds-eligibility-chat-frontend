@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Action } from '$lib/types';
-	import { sendPayload } from '$lib/chat.svelte';
-	import SubmitButton from '$lib/components/buttons/SubmitButton.svelte';
+	import { chatState } from '$lib/chat.svelte';
 
 	let { actions } = $props<{
 		actions: Action[];
@@ -9,14 +8,14 @@
 
 	let selectedPayloads: string[] = $state([]);
 
-	function handleSubmit() {
-		if (selectedPayloads.length > 0) {
-			sendPayload(selectedPayloads.join(', '));
-		}
-	}
+	$effect(() => {
+		chatState.pendingActionPayload =
+			selectedPayloads.length > 0 ? selectedPayloads.join(', ') : undefined;
+	});
 </script>
 
 <div class="checklist-component">
+	<div class="heading-text"><b>Please select all that apply:</b></div>
 	<div class="checklist-group">
 		{#each actions as action (action.payload)}
 			<div>
@@ -28,36 +27,22 @@
 			</div>
 		{/each}
 	</div>
-
-	<SubmitButton onclick={handleSubmit} disabled={selectedPayloads.length === 0} />
 </div>
 
 <style>
-	.checklist-component {
-		margin-top: 0.5em;
-		padding-left: 1em;
-		padding-right: 1em;
-		padding-top: 1em;
-		padding-bottom: 1em;
-		border: 1px black solid;
-		border-radius: 1em;
-	}
-
 	.checklist-group {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5em; /* Keep the gap between items */
-		margin-bottom: 0.5em;
-		margin-top: 0.5em;
+		gap: 0.5em;
 	}
 
 	.checklist-group > div {
-		/* Target the div wrapping each label */
-		height: 2.75em; /* Standardized height */
+		height: 2.75em; 
 		display: flex; /* To vertically center the label content */
 		align-items: center; /* Vertically center the label */
 		border: 1px solid #aaaaaa;
 		border-radius: 0.5em;
+		background-color: white;
 	}
 
 	.checklist-label {
@@ -66,8 +51,8 @@
 		justify-content: space-between;
 		cursor: pointer;
 		font-size: 1em;
-		width: 100%; /* Ensure label takes full width within its div */
-		height: 100%; /* Take full height of its parent div */
+		width: 100%; 
+		height: 100%; 
 		padding-right: 0.75em;
 		padding-left: 1.25em;
 	}
@@ -79,7 +64,7 @@
 	.checklist-custom {
 		height: 1.25em;
 		width: 1.25em;
-		background-color: transparent;
+		background-color: white;
 		border-radius: 0.25em;
 		display: inline-block;
 		position: relative;
@@ -88,7 +73,7 @@
 	}
 
 	.checklist-label input[type='checkbox']:checked + .checklist-custom {
-		background-color: transparent;
+		background-color: white;
 		border-color: #333;
 	}
 
@@ -107,5 +92,9 @@
 
 	.checklist-label input[type='checkbox']:checked + .checklist-custom::after {
 		display: block;
+	}
+
+	.heading-text {
+		padding-bottom: 1em;
 	}
 </style>

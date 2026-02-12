@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { chatState } from '$lib/chat.svelte';
+
 	let {
 		value = $bindable(),
 		loading = false,
@@ -23,7 +25,10 @@
 	}
 </script>
 
-<div class="chat-input-wrapper">
+<div
+	class="chat-input-wrapper"
+	class:no-bottom-padding={chatState.activeActions.length > 0 && chatState.messages.at(-1)}
+>
 	<div class="chat-input-box">
 		<label for="chat-input-box-input" class="visually-hidden">Type a message</label>
 		<textarea
@@ -35,34 +40,47 @@
 			disabled={loading}
 			rows="1"
 		></textarea>
-		<button type="button" onclick={handleSend} disabled={loading} aria-label="Send message"
-		></button>
 	</div>
+	<button
+		type="button"
+		class="send-button"
+		onclick={handleSend}
+		disabled={loading || (!value && !chatState.pendingActionPayload)}
+		aria-label="Send message"><b>Send</b></button
+	>
 </div>
 
 <style>
 	.chat-input-wrapper {
-		padding: 1.5em 2em;
-		height: 2.75em;
+		padding: 0 1em 1.5em 1em;
 		background-color: #f5f5f5;
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+	}
+
+	.chat-input-wrapper.no-bottom-padding {
+		padding-bottom: 0;
 	}
 
 	.chat-input-box {
 		position: relative;
+		flex: 1;
 		display: flex;
-		gap: 0.5rem;
 		align-items: center;
 		min-height: 2.75em;
-		padding: 0 2.75em 0 1.5em;
+		padding: 0 1em 0 1em;
 		border: 1px solid #aaaaaa;
 		background-color: white;
 		border-radius: 22px;
+		box-sizing: border-box;
+		/* max-width: 100%; */
+		max-width: calc(100% - 4.5em);
 	}
 
 	.chat-input-box textarea {
 		flex: 1;
 		padding: 0;
-		margin-right: 0.75em;
 		font-size: 1rem;
 		border: none;
 		border-top: 0.75em solid transparent;
@@ -74,18 +92,16 @@
 		max-height: 4em;
 		overflow-y: auto;
 		background-clip: padding-box;
+		max-width: 100%;
 	}
 
 	.chat-input-box textarea:focus {
 		outline: none;
 	}
 
-	.chat-input-box button {
-		position: absolute;
-		right: 0.5rem;
-		bottom: 0.375rem;
-		width: 2em;
-		height: 2em;
+	.send-button {
+		width: 4em;
+		height: 2.75em;
 		padding: 0;
 		display: flex;
 		justify-content: center;
@@ -93,13 +109,13 @@
 		font-size: 1rem;
 		cursor: pointer;
 		border: none;
-		border-radius: 50%;
+		border-radius: 1em;
 		background-color: black;
 		color: white; /* For potential icon */
 		flex-shrink: 0;
 	}
 
-	.chat-input-box button:disabled {
+	.send-button:disabled {
 		cursor: not-allowed;
 		opacity: 0.6;
 	}

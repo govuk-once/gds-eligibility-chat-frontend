@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Action } from '$lib/types';
-	import { sendPayload } from '$lib/chat.svelte';
-	import SubmitButton from '$lib/components/buttons/SubmitButton.svelte';
+	import { chatState } from '$lib/chat.svelte';
 
 	let { actions } = $props<{
 		actions: Action[];
@@ -9,11 +8,9 @@
 
 	let selectedValue: string | undefined = $state(undefined);
 
-	function handleSubmit() {
-		if (selectedValue) {
-			sendPayload(selectedValue);
-		}
-	}
+	$effect(() => {
+		chatState.pendingActionPayload = selectedValue;
+	});
 </script>
 
 <div class="radio-component">
@@ -33,35 +30,22 @@
 			</div>
 		{/each}
 	</div>
-
-	<SubmitButton onclick={handleSubmit} disabled={!selectedValue} />
 </div>
 
 <style>
-	.radio-component {
-		margin-top: 0.5em;
-		padding-left: 1em;
-		padding-right: 1em;
-		padding-top: 1em;
-		padding-bottom: 1em;
-		border: 1px black solid;
-		border-radius: 1em;
-	}
 	.radio-group {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5em; /* Keep the gap between items */
-		margin-top: 0.5em;
-		margin-bottom: 0.5em;
+		gap: 0.5em; 
 	}
 
 	.radio-group > div {
-		/* Target the div wrapping each label */
-		height: 2.75em; /* Standardized height */
+		height: 2.75em; 
 		display: flex; /* To vertically center the label content */
 		align-items: center; /* Vertically center the label */
 		border: 1px solid #aaaaaa;
 		border-radius: 0.5em;
+		background-color: white;
 	}
 
 	.radio-label {
@@ -71,8 +55,7 @@
 		font-size: 1em;
 		padding-left: 1.75em;
 		gap: 0.75em;
-		width: 100%; /* Ensure label takes full width within its div */
-		height: 100%; /* Take full height of its parent div */
+		width: 100%; 
 	}
 
 	.radio-label input[type='radio'] {
@@ -82,7 +65,7 @@
 	.radio-custom {
 		height: 0.75em;
 		width: 0.75em;
-		background-color: transparent;
+		background-color: white;
 		border-radius: 50%;
 		display: inline-block;
 		position: relative;
@@ -91,8 +74,8 @@
 	}
 
 	.radio-label input[type='radio']:checked + .radio-custom {
-		background-color: transparent; /* Changed to transparent */
-		border-color: black; /* Changed to black */
+		background-color: white;
+		border-color: black;
 	}
 
 	.radio-custom::after {
