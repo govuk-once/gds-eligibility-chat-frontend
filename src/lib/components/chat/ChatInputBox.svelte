@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { chatState } from '$lib/chat.svelte';
+
 	let {
 		value = $bindable(),
 		loading = false,
@@ -23,7 +25,10 @@
 	}
 </script>
 
-<div class="chat-input-wrapper">
+<div
+	class="chat-input-wrapper"
+	class:no-bottom-padding={chatState.activeActions.length > 0 && chatState.messages.at(-1)}
+>
 	<div class="chat-input-box">
 		<label for="chat-input-box-input" class="visually-hidden">Type a message</label>
 		<textarea
@@ -40,7 +45,7 @@
 		type="button"
 		class="send-button"
 		onclick={handleSend}
-		disabled={loading}
+		disabled={loading || (!value && !chatState.pendingActionPayload)}
 		aria-label="Send message"><b>Send</b></button
 	>
 </div>
@@ -48,11 +53,14 @@
 <style>
 	.chat-input-wrapper {
 		padding: 0 1em 1.5em 1em;
-		/* height: 2.75em; Removed fixed height to allow expansion */
 		background-color: #f5f5f5;
 		display: flex;
-		gap: 0.5rem; /* Space between input box and button */
+		gap: 0.5rem;
 		align-items: center;
+	}
+
+	.chat-input-wrapper.no-bottom-padding {
+		padding-bottom: 0;
 	}
 
 	.chat-input-box {

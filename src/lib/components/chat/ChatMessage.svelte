@@ -1,11 +1,6 @@
 <script lang="ts">
-	import type { Message, Action } from '$lib/types';
+	import type { Message } from '$lib/types';
 	import StreamingText from '$lib/components/chat/StreamingText.svelte';
-	import { getRandomDelay } from '$lib/utils/random-delay';
-	import UserAgentMessageActions from '$lib/components/actions/UserAgentMessageActions.svelte';
-	import BenefitAgentMessageActions from '$lib/components/actions/BenefitAgentMessageActions.svelte';
-	import DefaultMessageActions from '$lib/components/actions/DefaultMessageActions.svelte';
-	import { SvelteSet } from 'svelte/reactivity';
 
 	let { message, isLast, loading, onUpdate } = $props<{
 		message: Message;
@@ -13,46 +8,6 @@
 		loading: boolean;
 		onUpdate?: () => void;
 	}>();
-
-	let displayedActions = $state<Action[]>([]);
-	const timeouts = new SvelteSet<NodeJS.Timeout>();
-
-	$effect.pre(() => {
-		// This cleanup function runs before the main effect,
-		// and whenever the component is unmounted.
-		return () => {
-			for (const handle of timeouts) {
-				clearTimeout(handle);
-			}
-			timeouts.clear();
-		};
-	});
-
-	$effect(() => {
-		// When the message prop itself changes, this effect re-runs.
-		// The cleanup function from $effect.pre ensures we start fresh.
-		void message.id; // Establish dependency on the message ID
-		displayedActions = [];
-
-		// Schedule the animations for the new message
-		if (!message.streaming && message.actions) {
-			let cumulativeDelay = 0;
-			message.actions.forEach((action: Action, index: number) => {
-				cumulativeDelay += getRandomDelay(100, 250);
-				const handle = setTimeout(() => {
-					displayedActions.push(action);
-					timeouts.delete(handle);
-					// If this is the last action, call the update callback
-					if (index === message.actions!.length - 1) {
-						if (onUpdate) {
-							onUpdate();
-						}
-					}
-				}, cumulativeDelay);
-				timeouts.add(handle);
-			});
-		}
-	});
 </script>
 
 <div class="message {message.role} {message.vault ? 'vault' : ''}">
@@ -79,16 +34,6 @@
 				class="privacy-icon"
 			/>
 		</div>
-	{/if}
-
-	{#if displayedActions.length > 0}
-		{#if message.source === 'user_agent'}
-			<UserAgentMessageActions {message} {displayedActions} />
-		{:else if message.source === 'benefit_agent'}
-			<BenefitAgentMessageActions {message} {displayedActions} />
-		{:else}
-			<DefaultMessageActions {displayedActions} />
-		{/if}
 	{/if}
 </div>
 
