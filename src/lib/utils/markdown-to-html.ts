@@ -22,7 +22,7 @@ export async function markdownToHtml(markdown: string): Promise<string> {
 		// the negative lookbehind prevents matching inside existing links
 		html = html.replace(
 			regex,
-			(match) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${match}</a>`
+			(match) => `<b><a href="${url}" target="_blank" rel="noopener noreferrer">${match}</a></b>`
 		);
 	});
 
