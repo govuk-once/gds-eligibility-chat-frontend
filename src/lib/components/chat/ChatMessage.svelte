@@ -38,6 +38,9 @@
 </div>
 
 <style>
+	:global(.message a) {
+		color: black;
+	}
 	:global(.message p) {
 		margin: 0;
 		padding-left: 1em;

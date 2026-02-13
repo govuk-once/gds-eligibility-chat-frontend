@@ -14,16 +14,20 @@
 		afterSend?: (input?: ChatInputBox) => void;
 	}>();
 
+	const hasActiveActionsAndNotStreaming = $derived(
+		chatState.activeActions.length > 0 &&
+			chatState.messages.at(-1) &&
+			!chatState.messages.at(-1)?.streaming
+	);
+
 	let chatWindowEl: HTMLDivElement;
 	let chatInputBoxComponent: ChatInputBox;
 	let thinkingText = $state('Thinking');
 
-	let placeholderText = $derived(chatState.activeActions.length > 0 ? 'Or something else ...' : '');
-
-	const hasActiveActionsAndNotStreaming = $derived(
-		chatState.activeActions.length > 0 &&
-			chatState.messages.at(-1) &&
-			!chatState.messages.at(-1).streaming
+	let placeholderText = $derived(
+		chatState.activeActions.length > 0 && hasActiveActionsAndNotStreaming
+			? 'Or something else ...'
+			: ''
 	);
 
 	const isCurrentInputVaulted = $derived(
@@ -32,10 +36,7 @@
 				.reverse()
 				.find((m) => m.role === 'assistant');
 
-			return (
-				lastAssistantMessage?.source === 'benefit_agent' &&
-				lastAssistantMessage?.reply_type !== 'free_text'
-			);
+			return isUserInputVaulted(lastAssistantMessage);
 		})()
 	);
 
@@ -126,6 +127,7 @@
 			loading={chatState.loading}
 			onSend={handleSend}
 			placeholder={placeholderText}
+			{hasActiveActionsAndNotStreaming}
 		/>
 	</div>
 </div>
