@@ -37,7 +37,7 @@
 	}
 
 	.checklist-group > div {
-		height: 2.75em; 
+		height: 2.75em;
 		display: flex; /* To vertically center the label content */
 		align-items: center; /* Vertically center the label */
 		border: 1px solid #aaaaaa;
@@ -51,8 +51,8 @@
 		justify-content: space-between;
 		cursor: pointer;
 		font-size: 1em;
-		width: 100%; 
-		height: 100%; 
+		width: 100%;
+		height: 100%;
 		padding-right: 0.75em;
 		padding-left: 1.25em;
 	}

@@ -36,11 +36,11 @@
 	.radio-group {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5em; 
+		gap: 0.5em;
 	}
 
 	.radio-group > div {
-		height: 2.75em; 
+		height: 2.75em;
 		display: flex; /* To vertically center the label content */
 		align-items: center; /* Vertically center the label */
 		border: 1px solid #aaaaaa;
@@ -55,7 +55,7 @@
 		font-size: 1em;
 		padding-left: 1.75em;
 		gap: 0.75em;
-		width: 100%; 
+		width: 100%;
 	}
 
 	.radio-label input[type='radio'] {

@@ -100,10 +100,13 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 		chatState.loading = false;
 	}
 }
-export function finishedStreaming(messageId: string) {
+export async function finishedStreaming(messageId: string, finalMarkdown: string) {
 	const message = chatState.messages.find((m) => m.id === messageId);
 	if (message) {
 		message.streaming = false;
+		// Update message.html with the final processed content from streaming
+		const finalHtml = await markdownToHtml(finalMarkdown);
+		message.html = finalHtml;
 	}
 }
 

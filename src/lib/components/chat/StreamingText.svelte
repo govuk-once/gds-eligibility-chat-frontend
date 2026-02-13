@@ -3,6 +3,7 @@
 	import { markdownToHtml } from '$lib/utils/markdown-to-html';
 	import { finishedStreaming } from '$lib/chat.svelte';
 	import { getRandomDelay } from '$lib/utils/random-delay';
+	import { tick } from 'svelte';
 
 	export let content: string;
 	export let stream = false;
@@ -13,48 +14,65 @@
 	let htmlContent = '';
 	let intervalId: ReturnType<typeof setInterval> | undefined;
 
-	function debounce(fn: (markdown: string) => void, delay: number) {
-		let timeout: ReturnType<typeof setTimeout>;
-
-		return (markdown: string) => {
-			clearTimeout(timeout);
-			timeout = setTimeout(() => fn(markdown), delay);
-		};
-	}
-
 	async function updateHtml(markdown: string) {
 		htmlContent = await markdownToHtml(markdown);
 		onUpdate?.();
 	}
 
-	const debouncedUpdateHtml = debounce(updateHtml, 80);
-
-	function startStreaming() {
+	async function startStreaming() {
 		if (intervalId) clearInterval(intervalId);
 
-		displayedContent = '';
-		const words = content.split(/(\s+)/);
-		let i = 0;
-		const currentDelay = getRandomDelay(120, 125);
+		const fullHtml = await markdownToHtml(content);
 
-		intervalId = setInterval(() => {
-			const chunkSize = Math.floor(Math.random() * 2) + 5;
-			const chunk = words.slice(i, i + chunkSize).join(' ');
+		let index = 0;
+		let isRendering = false;
 
-			if (chunk) {
-				displayedContent += (i > 0 ? ' ' : '') + chunk;
-				debouncedUpdateHtml(displayedContent);
+		const delay = getRandomDelay(20, 40);
+
+		intervalId = setInterval(async () => {
+			if (isRendering) return;
+			isRendering = true;
+
+			const chunkSize = Math.floor(Math.random() * 4) + 2;
+
+			index = Math.min(index + chunkSize, fullHtml.length);
+
+			let nextIndex = index;
+
+			// If we're inside a tag, fast-forward to the end of the tag
+			if (fullHtml[nextIndex - 1] === '<') {
+				const closing = fullHtml.indexOf('>', nextIndex);
+				if (closing !== -1) {
+					nextIndex = closing + 1;
+				}
 			}
 
-			i += chunkSize;
+			// Also handle when we cut in the middle of a tag
+			const lastOpen = fullHtml.lastIndexOf('<', nextIndex);
+			const lastClose = fullHtml.lastIndexOf('>', nextIndex);
 
-			if (i >= words.length) {
-				if (intervalId) clearInterval(intervalId);
-				displayedContent = content;
-				updateHtml(content);
-				finishedStreaming(messageId);
+			if (lastOpen > lastClose) {
+				const closing = fullHtml.indexOf('>', nextIndex);
+				if (closing !== -1) {
+					nextIndex = closing + 1;
+				}
 			}
-		}, currentDelay);
+
+			// Incrementally update htmlContent
+			htmlContent = fullHtml.slice(0, nextIndex);
+
+			// Notify parent after DOM updates
+			await tick();
+			onUpdate?.();
+
+			if (nextIndex >= fullHtml.length) {
+				clearInterval(intervalId);
+				finishedStreaming(messageId, content);
+			}
+
+			index = nextIndex;
+			isRendering = false;
+		}, delay);
 	}
 
 	function stopStreaming() {

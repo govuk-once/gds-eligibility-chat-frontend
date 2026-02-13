@@ -4,6 +4,7 @@
 	let {
 		value = $bindable(),
 		loading = false,
+		hasActiveActionsAndNotStreaming = false,
 		placeholder = '',
 		onSend = () => {} // Callback prop
 	} = $props();
@@ -25,10 +26,7 @@
 	}
 </script>
 
-<div
-	class="chat-input-wrapper"
-	class:no-bottom-padding={chatState.activeActions.length > 0 && chatState.messages.at(-1)}
->
+<div class="chat-input-wrapper" class:no-bottom-padding={hasActiveActionsAndNotStreaming}>
 	<div class="chat-input-box">
 		<label for="chat-input-box-input" class="visually-hidden">Type a message</label>
 		<textarea
