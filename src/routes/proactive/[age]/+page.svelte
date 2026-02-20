@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import { initializeChat, startProactiveSession } from '$lib/chat.svelte';
-    import ProactiveChat from '../../../routes/+page.svelte';
+	import { onMount } from 'svelte';
+	import { initializeChat, startProactiveSession } from '$lib/chat.svelte';
+	import ProactiveChat from '../../../routes/+page.svelte';
 
-    onMount(() => {
-        initializeChat({ proactive: true });
-        startProactiveSession();
-    });
+	onMount(() => {
+		initializeChat({ proactive: true });
+		startProactiveSession();
+	});
 </script>
 
 <ProactiveChat />
