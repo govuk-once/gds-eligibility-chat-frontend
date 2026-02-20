@@ -16,6 +16,7 @@ export const createAdkSession = async (
 	const body = statePrompt ? {'app:state_prompt': statePrompt} : {};
 
 	logger.info({ url }, 'Creating ADK Session');
+	logger.info({body}, 'ADK Session app:state_prompt')
 
 	try {
 		const response = await fetch(url, {

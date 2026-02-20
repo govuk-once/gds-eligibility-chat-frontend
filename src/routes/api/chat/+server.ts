@@ -2,7 +2,7 @@ import { json, type RequestHandler } from '@sveltejs/kit';
 import { invokeAdkAgent, createAdkSession } from '$lib/google-adk/adk-client.js';
 import { env } from '$env/dynamic/private';
 import { logger } from '$lib/utils/logger.js';
-import { proactiveSystemPrompts } from '$lib/proactive.js';
+import { proactiveSystemPrompts } from '$lib/prompts.js';
 
 export const POST: RequestHandler = async ({ request }) => {
     const data = await request.json();
@@ -17,7 +17,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const userId = env.ADK_USER_ID;
 
     if (!appName || !userId) {
-        throw new Error('ADK_APP_NAME and ADK_USER_ID must be set in environment variables.');
+        throw new Error('ADK_APP_NAME, PROACTIVE_ADK_APP_NAME and ADK_USER_ID must be set in environment variables.');
     }
 
     if (!sessionId) {

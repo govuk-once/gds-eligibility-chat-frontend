@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { proactiveSystemPrompts } from '$lib/proactive.js';
+import { proactiveSystemPrompts } from '$lib/prompts.js';
 
 export function load({ params }) {
     if (Object.keys(proactiveSystemPrompts).includes(params.age)) {
