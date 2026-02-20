@@ -8,10 +8,12 @@ const baseUrl = env.PUBLIC_ADK_API_URL;
 export const createAdkSession = async (
 	appName: string,
 	userId: string,
-	sessionId: string
+	sessionId: string,
+	statePrompt?: string
 ): Promise<void> => {
 	const url = `${baseUrl}/apps/${appName}/users/${userId}/sessions/${sessionId}`;
 	const headers = { 'Content-Type': 'application/json' };
+	const body = statePrompt ? {'app:state_prompt': statePrompt} : {};
 
 	logger.info({ url }, 'Creating ADK Session');
 
@@ -19,7 +21,7 @@ export const createAdkSession = async (
 		const response = await fetch(url, {
 			method: 'POST',
 			headers,
-			body: JSON.stringify({})
+			body: JSON.stringify(body)
 		});
 
 		if (!response.ok) {

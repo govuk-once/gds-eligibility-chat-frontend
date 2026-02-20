@@ -47,9 +47,15 @@
 		padding-right: 1em;
 	}
 
-	:global(.message ol ul h1 h2 h3 h4 h5 h6) {
+	:global(.message ol ul h2 h3 h4 h5 h6) {
 		padding-left: 1em;
 		padding-right: 1em;
+	}
+
+	:global(.message h1) {
+		margin-top: 0;
+		padding-left: 0.5em;
+		padding-right: 0.5em;
 	}
 
 	:global(.message li) {

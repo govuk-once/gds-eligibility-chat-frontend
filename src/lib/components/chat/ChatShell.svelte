@@ -68,7 +68,7 @@
 	}
 </script>
 
-<Header />
+<Header showVault={!chatState.proactive}/>
 
 <div class="chat-container">
 	<div class="chat-top-spacer"></div>
@@ -88,8 +88,9 @@
 			/>
 		{/each}
 
+		<!-- todo: need to wrap this in message-content or similar -->
 		{#if chatState.loading}
-			<ChatMessage
+			<ChatMessage 
 				message={{
 					id: 'loading-indicator',
 					role: 'assistant',
