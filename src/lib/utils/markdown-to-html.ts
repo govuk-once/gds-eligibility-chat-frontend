@@ -16,6 +16,9 @@ const sortedTerms = [...TERMS].sort((a, b) => b.text.length - a.text.length);
 export async function markdownToHtml(markdown: string): Promise<string> {
 	let html = converter.makeHtml(markdown);
 
+	// Normalise gov.uk casing
+	html = html.replace(/\bgov\.uk\b/gi, 'GOV.UK');
+
 	sortedTerms.forEach(({ text, url }) => {
 		const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 		const regex = new RegExp(`(?<!href="[^"]*)\\b${escaped}\\b`, 'gi');
