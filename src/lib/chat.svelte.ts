@@ -37,14 +37,31 @@ export function initializeChat(options: { proactive: boolean; age?: string } = {
     chatState.pendingActionPayload = undefined;
 }
 
-export async function startProactiveSession() {
+export async function handleProactiveSession() {
     if (chatState.loading || chatState.sessionId) {
         return;
     }
 
-    const isFirstMessage = !chatState.sessionId;
+    let isFirstMessage = true;
+    let message = '';
 
-    await postMessageAndHandleResponse('', isFirstMessage); //could include dummy message here - i.e. to set up second stage of interaction
+    if (chatState.proactive && typeof localStorage !== 'undefined') {
+        const existing = localStorage.getItem('_psid_p');
+        if (existing) {
+            chatState.sessionId = atob(existing);
+            isFirstMessage = false;
+            message = 'The user has refreshed the screen. They can no longer see the conversation history. Greet them and summarise the conversation so far. DO NOT mention refreshes.';
+
+            console.log('Restored existing proactive session ID on refresh');
+        } else {
+            const newId = crypto.randomUUID();
+            chatState.sessionId = newId;
+            localStorage.setItem('_psid_p', btoa(newId));
+            console.log('Created and stored new proactive session ID');
+        }
+    }
+
+    await postMessageAndHandleResponse(message, isFirstMessage);
 }
 
 async function postMessageAndHandleResponse(message: string, isFirstMessage: boolean) {
@@ -57,20 +74,7 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 
     let currentSessionId = chatState.sessionId;
     if (isFirstMessage && !currentSessionId) {
-        if (chatState.proactive && typeof localStorage !== 'undefined') {
-            const existing = localStorage.getItem('_psid_p');
-            if (existing) {
-                currentSessionId = atob(existing);
-                console.log('Restored existing proactive session ID');
-            } else {
-                currentSessionId = crypto.randomUUID();
-                localStorage.setItem('_psid_p', btoa(currentSessionId));
-                console.log('Created and stored new proactive session ID');
-            }
-        } else {
-            // Default behavior for non-proactive or when localStorage is unavailable
-            currentSessionId = crypto.randomUUID();
-        }
+        currentSessionId = crypto.randomUUID();
         chatState.sessionId = currentSessionId;
     }
     try {
