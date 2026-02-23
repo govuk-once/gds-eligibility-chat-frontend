@@ -63,16 +63,6 @@ export const createAdkSession = async (
 		});
 
 		if (!response.ok) {
-			// if (response.status === 409) {
-			//     logger.info({ url }, 'ADK Session already exists, updating with new prompt');
-			//     await updateAdkSession(
-			//         appName,
-			//         userId,
-			//         sessionId,
-			//         'Warmly welcome the user back to the service (imagine some time has passed since last interaction), and provide a complete summary of the user information provided so far'
-			//     );
-			//     return;
-			// }
 			const errorData = await response.json();
 			logger.error({ status: response.status, errorData }, 'ADK Session creation failed');
 			const detail = errorData.detail?.[0]?.msg || 'Failed to create session';
