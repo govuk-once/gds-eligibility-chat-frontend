@@ -9,7 +9,7 @@ export const updateAdkSession = async (
 	appName: string,
 	userId: string,
 	sessionId: string,
-	statePrompt: string
+	statePrompt?: string
 ): Promise<void> => {
 	const url = `${baseUrl}/apps/${appName}/users/${userId}/sessions/${sessionId}`;
 	const headers = { 'Content-Type': 'application/json' };

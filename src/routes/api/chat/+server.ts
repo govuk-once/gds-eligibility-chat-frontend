@@ -46,7 +46,7 @@ export const POST: RequestHandler = async ({ request }) => {
 						appName,
 						userId,
 						sessionId,
-						'Warmly welcome the user back and provide a short summary of previous context.'
+						statePrompt // this could be a six months later prompt
 					);
 				} else {
 					throw err;
