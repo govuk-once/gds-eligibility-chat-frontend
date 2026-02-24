@@ -18,7 +18,7 @@
 
 <div class="page-container" class:frame-on-background={frameOn}>
 	<div class="app-container" use:virtualViewportSizer={!frameOn} class:frame-on-container={frameOn}>
-		<ChatShell {afterSend} footerClass={frameOn ? 'keyboard-collapsed-footer' : ''} />
+		<ChatShell {afterSend} isFrameOn={frameOn} />
 		<FrameToggler on={frameOn} toggle={toggleFrame} />
 	</div>
 </div>

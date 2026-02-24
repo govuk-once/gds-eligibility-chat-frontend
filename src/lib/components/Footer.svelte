@@ -1,13 +1,25 @@
 <script lang="ts">
-	let { class: className = '' } = $props<{ class?: string }>();
+	import { chatState } from '$lib/chat.svelte';
+	import { device } from '$lib/device.svelte';
+
+	let { class: className = '', isFrameOn = false } = $props<{
+		class?: string;
+		isFrameOn?: boolean;
+	}>();
+
+	const isProactiveWebNoFrame = $derived(chatState.proactive && !device.isMobile && !isFrameOn);
 </script>
 
-<footer class={className}></footer>
+<footer class={className} class:proactive-footer={isProactiveWebNoFrame}></footer>
 
 <style>
 	footer {
 		height: 6.625em;
 		background-color: #f5f5f5;
+	}
+
+	footer.proactive-footer {
+		height: 3.5em;
 	}
 
 	.keyboard-collapsed-footer {

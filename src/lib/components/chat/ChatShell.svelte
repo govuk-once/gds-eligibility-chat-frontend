@@ -9,10 +9,17 @@
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
 	import { isUserInputVaulted } from '$lib/utils/is-user-input-vaulted';
 
-	const { footerClass = '', afterSend: afterSendCallback = null } = $props<{
+	const {
+		footerClass: footerClassProp = '',
+		afterSend: afterSendCallback = null,
+		isFrameOn = false
+	} = $props<{
 		footerClass?: string;
 		afterSend?: (input?: ChatInputBox) => void;
+		isFrameOn?: boolean;
 	}>();
+
+	const footerClass = $derived(footerClassProp || (isFrameOn ? 'keyboard-collapsed-footer' : ''));
 
 	const hasActiveActionsAndNotStreaming = $derived(
 		chatState.activeActions.length > 0 &&
@@ -68,7 +75,7 @@
 	}
 </script>
 
-<Header showVault={!chatState.proactive} />
+<Header showVault={!chatState.proactive} {isFrameOn} />
 
 <div class="chat-container">
 	<div class="chat-top-spacer"></div>
@@ -133,7 +140,7 @@
 	</div>
 </div>
 
-<Footer class={footerClass} />
+<Footer class={footerClass} {isFrameOn} />
 
 <style>
 	.chat-container {

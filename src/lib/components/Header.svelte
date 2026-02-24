@@ -1,12 +1,17 @@
 <script lang="ts">
 	import { chatState } from '$lib/chat.svelte';
+	import { device } from '$lib/device.svelte';
 
-	let { showVault = true } = $props<{ showVault?: boolean }>();
+	let { showVault = true, isFrameOn = false } = $props<{
+		showVault?: boolean;
+		isFrameOn?: boolean;
+	}>();
 
 	const vaultCount = $derived(chatState.messages.filter((m) => m.vault).length);
+	const isProactiveWebNoFrame = $derived(chatState.proactive && !device.isMobile && !isFrameOn);
 </script>
 
-<header>
+<header class:proactive-header={isProactiveWebNoFrame}>
 	{#if showVault}
 		<div class="vault-container">
 			<div class="shield-container">
@@ -34,6 +39,10 @@
 		align-items: flex-end;
 		padding: 0 0.5em;
 		background-color: #f5f5f5;
+	}
+
+	header.proactive-header {
+		height: 1em;
 	}
 
 	.vault-container {
