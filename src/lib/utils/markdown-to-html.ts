@@ -8,7 +8,7 @@ const TERMS = [
 	{ text: 'PIP', url: 'https://www.gov.uk/pip' },
 	{ text: 'Universal Credit', url: 'https://www.gov.uk/universal-credit' },
 	{ text: 'UC', url: 'https://www.gov.uk/universal-credit' },
-	{ text: 'GOV.UK', url: 'https://www.gov.uk'}
+	{ text: 'GOV.UK', url: 'https://www.gov.uk' }
 ];
 
 // Sort longest first to avoid partial matches
