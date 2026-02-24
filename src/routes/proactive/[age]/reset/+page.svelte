@@ -9,7 +9,7 @@
 		localStorage.clear();
 		initializeChat();
 		if (age) {
-			goto(`proactive/${age}`);
+			goto(`/proactive/${age}`);
 		} else {
 			goto('/');
 		}
