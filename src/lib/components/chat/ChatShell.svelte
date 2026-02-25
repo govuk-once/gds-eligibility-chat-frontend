@@ -49,6 +49,7 @@
 
 	$effect(() => {
 		if (!chatState.loading) return;
+		// debugger; // use to analyse during 'thinking' state
 
 		const interval = setInterval(() => {
 			thinkingText += '.';
@@ -87,15 +88,16 @@
 		class:hide-scrollbar={footerClass === 'keyboard-collapsed-footer'}
 	>
 		{#each chatState.messages as m, i (m.id)}
-			<ChatMessage
-				message={m}
-				isLast={i === chatState.messages.length - 1}
-				loading={chatState.loading}
-				onUpdate={handleStreamUpdate}
-			/>
+			{#if !(chatState.loading && i === chatState.messages.length - 1)}
+				<ChatMessage
+					message={m}
+					isLast={i === chatState.messages.length - 1}
+					loading={chatState.loading}
+					onUpdate={handleStreamUpdate}
+				/>
+			{/if}
 		{/each}
 
-		<!-- todo: need to wrap this in message-content or similar -->
 		{#if chatState.loading}
 			<ChatMessage
 				message={{

@@ -12,15 +12,11 @@
 
 <div class="message {message.role} {message.vault ? 'vault' : ''}">
 	<div class="message-content">
-		{#if message.html}
-			{#if message.role === 'assistant' && isLast && !loading && message.markdown}
-				<StreamingText messageId={message.id} content={message.markdown} stream={true} {onUpdate} />
-			{:else}
-				<!-- we have sanitised message.html with DOMPurify -->
-				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-				{@html message.html}
-			{/if}
-		{:else}
+		{#if message.role === 'assistant' && isLast && !loading && message.markdown}
+			<StreamingText messageId={message.id} content={message.markdown} stream={true} {onUpdate} />
+		{:else if message.html}
+			{@html message.html}
+		{:else if message.text}
 			{message.text}
 		{/if}
 	</div>
@@ -46,13 +42,18 @@
 		padding-left: 1em;
 		padding-right: 1em;
 	}
+	:global(.message ol li + li) {
+		margin-top: 0.5em;
+	}
 
 	:global(.message ol) {
+		list-style-position: inside;
 		padding-left: 1em;
 		padding-right: 1em;
 	}
 
 	:global(.message ul) {
+		list-style-position: inside;
 		padding-left: 1em;
 		padding-right: 1em;
 	}
