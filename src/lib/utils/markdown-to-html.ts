@@ -18,7 +18,7 @@ export async function markdownToHtml(markdown: string): Promise<string> {
 	let html = converter.makeHtml(markdown);
 
 	// Normalise gov.uk casing
-	html = html.replace(/\bgov\.uk\b/gi, 'GOV.UK');
+	html = html.replace(/\bgov\.uk\b(?!\/)/gi, 'GOV.UK');
 
 	sortedTerms.forEach(({ text, url }) => {
 		const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
