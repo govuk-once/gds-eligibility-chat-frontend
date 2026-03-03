@@ -76,7 +76,7 @@
 	}
 </script>
 
-<Header showVault={!chatState.proactive} {isFrameOn} />
+<Header showVault={!chatState.config.isProactive} {isFrameOn} />
 
 <div class="chat-container">
 	<div class="chat-top-spacer"></div>

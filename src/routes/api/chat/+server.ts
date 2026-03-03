@@ -3,16 +3,17 @@ import { invokeAdkAgent, createAdkSession, updateAdkSession } from '$lib/google-
 import { env } from '$env/dynamic/private';
 import { logger } from '$lib/utils/logger.js';
 import { proactiveSystemPrompts } from '$lib/prompts.js';
+import type { ChatSessionConfig } from '$lib/types';
 
 export const POST: RequestHandler = async ({ request }) => {
 	const data = await request.json();
 	const userMessage = data.message;
 	const sessionId = data.sessionId;
 	const isFirstMessage = data.is_first_message;
-	const ageFromClient = data.age;
+	const config = data.config as ChatSessionConfig;
 
-	const referer = request.headers.get('referer');
-	const isProactive = referer?.includes('/proactive/') || !!ageFromClient;
+	const isProactive = config?.isProactive ?? false;
+	const ageGroup = config?.ageGroup;
 
 	const appName = isProactive ? env.PROACTIVE_ADK_APP_NAME : env.ADK_APP_NAME;
 	const userId = env.ADK_USER_ID;
@@ -28,8 +29,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	try {
-		if (isProactive) {
-			const ageGroup = ageFromClient || referer?.split('/').pop() || '';
+		if (isProactive && ageGroup) {
 			const statePrompt = proactiveSystemPrompts[ageGroup];
 
 			if (isFirstMessage) {

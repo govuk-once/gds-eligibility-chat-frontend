@@ -1,4 +1,4 @@
-import type { Message, Action } from '$lib/types';
+import type { Message, Action, ChatSessionConfig } from '$lib/types';
 import { markdownToHtml } from '$lib/utils/markdown-to-html';
 import { parseUserAgentMultipleChoice } from '$lib/utils/parse-user-agent-multiple-choice';
 import {
@@ -14,16 +14,15 @@ export const chatState = $state({
 	sessionId: undefined as string | undefined,
 	activeActions: [] as Action[],
 	pendingActionPayload: undefined as string | undefined,
-	proactive: false,
-	age: undefined as string | undefined
+	config: {
+		isProactive: false,
+		ageGroup: undefined
+	} as ChatSessionConfig
 });
 
-export function initializeChat(
-	options: { proactive: boolean; age?: string } = { proactive: false }
-) {
-	chatState.proactive = options.proactive;
-	chatState.age = options.age;
-	chatState.messages = options.proactive
+export function initializeChat(config: ChatSessionConfig = { isProactive: false }) {
+	chatState.config = config;
+	chatState.messages = config.isProactive
 		? []
 		: [
 				{
@@ -47,7 +46,7 @@ export async function handleProactiveSession() {
 	let isFirstMessage = true;
 	let message = '';
 
-	if (chatState.proactive && typeof localStorage !== 'undefined') {
+	if (chatState.config.isProactive && typeof localStorage !== 'undefined') {
 		const existing = localStorage.getItem('_psid_p');
 		if (existing) {
 			chatState.sessionId = atob(existing);
@@ -88,7 +87,7 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 				message: message,
 				sessionId: currentSessionId,
 				is_first_message: isFirstMessage,
-				age: chatState.age
+				config: chatState.config
 			})
 		});
 
@@ -100,7 +99,7 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 		const resData = await res.json();
 		const finalResponse: ElicitationResponse = extractFinalModelResponse(
 			resData,
-			chatState.proactive
+			chatState.config.isProactive
 		);
 
 		const fullResponseMarkdown =

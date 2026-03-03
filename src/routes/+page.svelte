@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte';
 
 	onMount(() => {
-		initializeChat({ proactive: false });
+		initializeChat({ isProactive: false });
 	});
 
 	initDeviceListeners();

@@ -8,7 +8,9 @@
 	}>();
 
 	const vaultCount = $derived(chatState.messages.filter((m) => m.vault).length);
-	const isProactiveWebNoFrame = $derived(chatState.proactive && !device.isMobile && !isFrameOn);
+	const isProactiveWebNoFrame = $derived(
+		chatState.config.isProactive && !device.isMobile && !isFrameOn
+	);
 </script>
 
 <header class:proactive-header={isProactiveWebNoFrame}>

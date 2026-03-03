@@ -7,7 +7,9 @@
 		isFrameOn?: boolean;
 	}>();
 
-	const isProactiveWebNoFrame = $derived(chatState.proactive && !device.isMobile && !isFrameOn);
+	const isProactiveWebNoFrame = $derived(
+		chatState.config.isProactive && !device.isMobile && !isFrameOn
+	);
 </script>
 
 <footer class={className} class:proactive-footer={isProactiveWebNoFrame}></footer>

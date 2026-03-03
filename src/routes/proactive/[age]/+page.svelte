@@ -6,7 +6,7 @@
 	let { data } = $props();
 
 	onMount(() => {
-		initializeChat({ proactive: true, age: data.age });
+		initializeChat({ isProactive: true, ageGroup: data.age });
 		handleProactiveSession();
 	});
 </script>
