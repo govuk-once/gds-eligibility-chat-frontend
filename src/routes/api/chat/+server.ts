@@ -13,14 +13,22 @@ export const POST: RequestHandler = async ({ request }) => {
 	const config = data.config as ChatSessionConfig;
 
 	const isProactive = config?.isProactive ?? false;
+	const isChildBenefit = config?.isChildBenefit ?? false;
 	const ageGroup = config?.ageGroup;
 
-	const appName = isProactive ? env.PROACTIVE_ADK_APP_NAME : env.ADK_APP_NAME;
+	let appName = env.ADK_APP_NAME;
+
+	if (isChildBenefit) {
+	appName = env.CHILD_BENEFIT_ADK_APP_NAME;
+	} else if (isProactive) {
+	appName = env.PROACTIVE_ADK_APP_NAME;
+	}
+	
 	const userId = env.ADK_USER_ID;
 
 	if (!appName || !userId) {
 		throw new Error(
-			'ADK_APP_NAME, PROACTIVE_ADK_APP_NAME and ADK_USER_ID must be set in environment variables.'
+			'ADK_APP_NAME, PROACTIVE_ADK_APP_NAME, CHILD_BENEFIT_ADK_APP_NAME and ADK_USER_ID must be set in environment variables.'
 		);
 	}
 

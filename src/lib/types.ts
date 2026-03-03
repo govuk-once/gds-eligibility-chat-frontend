@@ -28,6 +28,7 @@ export type Message = {
 export interface ChatSessionConfig {
 	isProactive: boolean;
 	ageGroup?: string;
+	isChildBenefit?: boolean;
 }
 
 export interface ChatContext {
