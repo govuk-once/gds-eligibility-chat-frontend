@@ -4,6 +4,7 @@
 	import Button from '$lib/components/buttons/Button.svelte';
 	import DoubleButton from '$lib/components/buttons/DoubleButton.svelte';
 	import ActionsLayout from '$lib/components/actions/ActionsLayout.svelte';
+	import ChecklistButton from '$lib/components/buttons/ChecklistButton.svelte';
 
 	let { message, displayedActions } = $props<{
 		message: Message;
@@ -38,6 +39,12 @@
 				noLabel={displayedActions[1].label}
 				onNoClick={() => sendPayload(displayedActions[1].payload)}
 			/>
+		{/if}
+	{:else if message.reply_type === 'choice_multiple'}
+		{#if displayedActions.length === message.actions?.length}
+			<ActionsLayout>
+				<ChecklistButton actions={displayedActions} />
+			</ActionsLayout>
 		{/if}
 	{/if}
 </ActionsLayout>

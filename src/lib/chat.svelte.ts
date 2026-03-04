@@ -1,6 +1,5 @@
 import type { Message, Action, ChatSessionConfig } from '$lib/types';
 import { markdownToHtml } from '$lib/utils/markdown-to-html';
-import { parseUserAgentMultipleChoice } from '$lib/utils/parse-user-agent-multiple-choice';
 import {
 	extractFinalModelResponse,
 	type ElicitationResponse
@@ -102,19 +101,15 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 			chatState.config.isProactive
 		);
 
-		const fullResponseMarkdown =
-			finalResponse.source === 'user_agent' && finalResponse.reply_type === 'choice_multiple'
-				? parseUserAgentMultipleChoice(finalResponse)
-				: finalResponse.content;
 		const actions = finalResponse.actions;
 		const source = finalResponse.source;
 		const reply_type = finalResponse.reply_type;
 
-		const safeHtml = await markdownToHtml(fullResponseMarkdown);
+		const safeHtml = await markdownToHtml(finalResponse.content);
 
 		const assistantMessage = chatState.messages.find((m) => m.id === assistantMessageId);
 		if (assistantMessage) {
-			assistantMessage.markdown = fullResponseMarkdown;
+			assistantMessage.markdown = finalResponse.content;
 			assistantMessage.source = source || 'user_agent';
 			assistantMessage.reply_type = reply_type || 'free_text';
 			if (safeHtml) {
