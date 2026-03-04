@@ -58,35 +58,60 @@
 		padding-right: 1em;
 	}
 
-	:global(.message h1) {
+	:global(.message-content > :first-child) {
 		margin-top: 0;
-		padding-left: 0.5em;
-		padding-right: 0.5em;
+	}
+
+	:global(.message h1) {
+		font-size: inherit;
+		padding-left: 1em;
+		padding-right: 1em;
 	}
 
 	:global(.message h2) {
-		padding-left: 0.5em;
-		padding-right: 0.5em;
+		font-size: inherit;
+		margin-top: 1em;
+		margin-bottom: 1em;
+		padding-left: 1em;
+		padding-right: 1em;
 	}
 
 	:global(.message h3) {
-		padding-left: 0.5em;
-		padding-right: 0.5em;
+		font-size: inherit;
+		margin-top: 1em;
+		margin-bottom: 1em;
+		padding-left: 1em;
+		padding-right: 1em;
 	}
 
 	:global(.message h4) {
-		padding-left: 0.5em;
-		padding-right: 0.5em;
+		font-size: inherit;
+		margin-top: 1em;
+		margin-bottom: 1em;
+		padding-left: 1em;
+		padding-right: 1em;
 	}
 
 	:global(.message h5) {
-		padding-left: 0.5em;
-		padding-right: 0.5em;
+		font-size: inherit;
+		margin-top: 1em;
+		margin-bottom: 1em;
+		padding-left: 1em;
+		padding-right: 1em;
 	}
 
 	:global(.message h6) {
-		padding-left: 0.5em;
-		padding-right: 0.5em;
+		font-size: inherit;
+		margin-top: 1em;
+		margin-bottom: 1em;
+		padding-left: 1em;
+		padding-right: 1em;
+	}
+
+	:global(.message hr) {
+		margin: 1em 1em;
+		border: none;
+		border-top: 1px solid #ddd;
 	}
 
 	:global(.message li) {
