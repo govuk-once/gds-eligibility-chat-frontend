@@ -46,13 +46,8 @@
 		margin-top: 0.5em;
 	}
 
-	:global(.message ol) {
-		list-style-position: inside;
-		padding-left: 1em;
-		padding-right: 1em;
-	}
-
-	:global(.message ul) {
+	:global(.message ol),
+	:global(.messahe ul) {
 		list-style-position: inside;
 		padding-left: 1em;
 		padding-right: 1em;
@@ -62,44 +57,11 @@
 		margin-top: 0;
 	}
 
-	:global(.message h1) {
-		font-size: inherit;
-		padding-left: 1em;
-		padding-right: 1em;
-	}
-
-	:global(.message h2) {
-		font-size: inherit;
-		margin-top: 1em;
-		margin-bottom: 1em;
-		padding-left: 1em;
-		padding-right: 1em;
-	}
-
-	:global(.message h3) {
-		font-size: inherit;
-		margin-top: 1em;
-		margin-bottom: 1em;
-		padding-left: 1em;
-		padding-right: 1em;
-	}
-
-	:global(.message h4) {
-		font-size: inherit;
-		margin-top: 1em;
-		margin-bottom: 1em;
-		padding-left: 1em;
-		padding-right: 1em;
-	}
-
-	:global(.message h5) {
-		font-size: inherit;
-		margin-top: 1em;
-		margin-bottom: 1em;
-		padding-left: 1em;
-		padding-right: 1em;
-	}
-
+	:global(.message h1),
+	:global(.message h2),
+	:global(.message h3),
+	:global(.message h4),
+	:global(.message h5),
 	:global(.message h6) {
 		font-size: inherit;
 		margin-top: 1em;
@@ -119,6 +81,10 @@
 	}
 	:global(.message.assistant p + p) {
 		margin-top: 1.5em;
+	}
+
+	:global(.message.assistant) {
+		padding-left: 1em;
 	}
 	.message {
 		font-size: 1em;
@@ -147,6 +113,7 @@
 
 	.message.assistant,
 	.message.error {
+		font-size: inherit;
 		padding-left: 0;
 		border-radius: 0;
 		background-color: transparent;
