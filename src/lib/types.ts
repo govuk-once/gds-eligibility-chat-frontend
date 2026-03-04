@@ -24,3 +24,14 @@ export type Message = {
 
 	vault?: boolean;
 };
+
+export interface ChatSessionConfig {
+	isProactive: boolean;
+	ageGroup?: string;
+	isChildBenefit?: boolean;
+}
+
+export interface ChatContext {
+	config: ChatSessionConfig;
+	sessionId?: string;
+}

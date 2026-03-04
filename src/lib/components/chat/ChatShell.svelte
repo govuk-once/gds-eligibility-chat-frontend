@@ -9,10 +9,17 @@
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
 	import { isUserInputVaulted } from '$lib/utils/is-user-input-vaulted';
 
-	const { footerClass = '', afterSend: afterSendCallback = null } = $props<{
+	const {
+		footerClass: footerClassProp = '',
+		afterSend: afterSendCallback = null,
+		isFrameOn = false
+	} = $props<{
 		footerClass?: string;
 		afterSend?: (input?: ChatInputBox) => void;
+		isFrameOn?: boolean;
 	}>();
+
+	const footerClass = $derived(footerClassProp || (isFrameOn ? 'keyboard-collapsed-footer' : ''));
 
 	const hasActiveActionsAndNotStreaming = $derived(
 		chatState.activeActions.length > 0 &&
@@ -42,6 +49,7 @@
 
 	$effect(() => {
 		if (!chatState.loading) return;
+		// debugger; // use to analyse during 'thinking' state
 
 		const interval = setInterval(() => {
 			thinkingText += '.';
@@ -68,7 +76,7 @@
 	}
 </script>
 
-<Header />
+<Header showVault={!chatState.config.isProactive} {isFrameOn} />
 
 <div class="chat-container">
 	<div class="chat-top-spacer"></div>
@@ -80,12 +88,14 @@
 		class:hide-scrollbar={footerClass === 'keyboard-collapsed-footer'}
 	>
 		{#each chatState.messages as m, i (m.id)}
-			<ChatMessage
-				message={m}
-				isLast={i === chatState.messages.length - 1}
-				loading={chatState.loading}
-				onUpdate={handleStreamUpdate}
-			/>
+			{#if !(chatState.loading && i === chatState.messages.length - 1)}
+				<ChatMessage
+					message={m}
+					isLast={i === chatState.messages.length - 1}
+					loading={chatState.loading}
+					onUpdate={handleStreamUpdate}
+				/>
+			{/if}
 		{/each}
 
 		{#if chatState.loading}
@@ -132,7 +142,7 @@
 	</div>
 </div>
 
-<Footer class={footerClass} />
+<Footer class={footerClass} {isFrameOn} />
 
 <style>
 	.chat-container {

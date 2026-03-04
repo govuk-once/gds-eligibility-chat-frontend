@@ -7,7 +7,8 @@ const TERMS = [
 	{ text: 'Personal Independence Payment', url: 'https://www.gov.uk/pip' },
 	{ text: 'PIP', url: 'https://www.gov.uk/pip' },
 	{ text: 'Universal Credit', url: 'https://www.gov.uk/universal-credit' },
-	{ text: 'UC', url: 'https://www.gov.uk/universal-credit' }
+	{ text: 'UC', url: 'https://www.gov.uk/universal-credit' },
+	{ text: 'GOV.UK', url: 'https://www.gov.uk' }
 ];
 
 // Sort longest first to avoid partial matches
@@ -15,6 +16,9 @@ const sortedTerms = [...TERMS].sort((a, b) => b.text.length - a.text.length);
 
 export async function markdownToHtml(markdown: string): Promise<string> {
 	let html = converter.makeHtml(markdown);
+
+	// Normalise gov.uk casing
+	html = html.replace(/\bgov\.uk\b(?!\/)/gi, 'GOV.UK');
 
 	sortedTerms.forEach(({ text, url }) => {
 		const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

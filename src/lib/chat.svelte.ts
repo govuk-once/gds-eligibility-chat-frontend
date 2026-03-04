@@ -1,4 +1,4 @@
-import type { Message, Action } from '$lib/types';
+import type { Message, Action, ChatSessionConfig } from '$lib/types';
 import { markdownToHtml } from '$lib/utils/markdown-to-html';
 import { parseUserAgentMultipleChoice } from '$lib/utils/parse-user-agent-multiple-choice';
 import {
@@ -8,19 +8,63 @@ import {
 import { isUserInputVaulted } from '$lib/utils/is-user-input-vaulted';
 
 export const chatState = $state({
-	messages: [
-		{
-			id: crypto.randomUUID(),
-			role: 'assistant',
-			html: '<p><b>Hi!</b> How can I help you today?</p>'
-		}
-	] as Message[],
+	messages: [] as Message[],
 	input: '',
 	loading: false,
 	sessionId: undefined as string | undefined,
 	activeActions: [] as Action[],
-	pendingActionPayload: undefined as string | undefined
+	pendingActionPayload: undefined as string | undefined,
+	config: {
+		isProactive: false,
+		ageGroup: undefined
+	} as ChatSessionConfig
 });
+
+export function initializeChat(config: ChatSessionConfig = { isProactive: false }) {
+	chatState.config = config;
+	chatState.messages = config.isProactive
+		? []
+		: [
+				{
+					id: crypto.randomUUID(),
+					role: 'assistant',
+					html: '<p><b>Hi!</b> How can I help you today?</p>'
+				}
+			];
+	chatState.input = '';
+	chatState.loading = false;
+	chatState.sessionId = undefined;
+	chatState.activeActions = [];
+	chatState.pendingActionPayload = undefined;
+}
+
+export async function handleProactiveSession() {
+	if (chatState.loading || chatState.sessionId) {
+		return;
+	}
+
+	let isFirstMessage = true;
+	let message = '';
+
+	if (chatState.config.isProactive && typeof localStorage !== 'undefined') {
+		const existing = localStorage.getItem('_psid_p');
+		if (existing) {
+			chatState.sessionId = atob(existing);
+			isFirstMessage = false;
+			message =
+				'The user has refreshed the screen. They can no longer see the conversation history. Greet them and summarise the conversation so far. DO NOT mention refreshes.';
+
+			console.log('Restored existing proactive session ID on refresh');
+		} else {
+			const newId = crypto.randomUUID();
+			chatState.sessionId = newId;
+			localStorage.setItem('_psid_p', btoa(newId));
+			console.log('Created and stored new proactive session ID');
+		}
+	}
+
+	await postMessageAndHandleResponse(message, isFirstMessage);
+}
 
 async function postMessageAndHandleResponse(message: string, isFirstMessage: boolean) {
 	chatState.loading = true;
@@ -42,7 +86,8 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 			body: JSON.stringify({
 				message: message,
 				sessionId: currentSessionId,
-				is_first_message: isFirstMessage
+				is_first_message: isFirstMessage,
+				config: chatState.config
 			})
 		});
 
@@ -52,7 +97,10 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 		}
 
 		const resData = await res.json();
-		const finalResponse: ElicitationResponse = extractFinalModelResponse(resData);
+		const finalResponse: ElicitationResponse = extractFinalModelResponse(
+			resData,
+			chatState.config.isProactive
+		);
 
 		const fullResponseMarkdown =
 			finalResponse.source === 'user_agent' && finalResponse.reply_type === 'choice_multiple'

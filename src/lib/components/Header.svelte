@@ -1,20 +1,36 @@
 <script lang="ts">
 	import { chatState } from '$lib/chat.svelte';
+	import { device } from '$lib/device.svelte';
+
+	let { showVault = true, isFrameOn = false } = $props<{
+		showVault?: boolean;
+		isFrameOn?: boolean;
+	}>();
 
 	const vaultCount = $derived(chatState.messages.filter((m) => m.vault).length);
+	const isProactiveWebNoFrame = $derived(
+		chatState.config.isProactive && !device.isMobile && !isFrameOn
+	);
 </script>
 
-<header>
-	<div class="vault-container">
-		<div class="shield-container">
-			<img src="/icons/shield-check.svg" alt="vault icon" aria-hidden="true" class="privacy-icon" />
-		</div>
-		{#if vaultCount > 0}
-			<div class="notification-dot">
-				<span>{vaultCount}</span>
+<header class:proactive-header={isProactiveWebNoFrame}>
+	{#if showVault}
+		<div class="vault-container">
+			<div class="shield-container">
+				<img
+					src="/icons/shield-check.svg"
+					alt="vault icon"
+					aria-hidden="true"
+					class="privacy-icon"
+				/>
 			</div>
-		{/if}
-	</div>
+			{#if vaultCount > 0}
+				<div class="notification-dot">
+					<span>{vaultCount}</span>
+				</div>
+			{/if}
+		</div>
+	{/if}
 </header>
 
 <style>
@@ -25,6 +41,10 @@
 		align-items: flex-end;
 		padding: 0 0.5em;
 		background-color: #f5f5f5;
+	}
+
+	header.proactive-header {
+		height: 1em;
 	}
 
 	.vault-container {
