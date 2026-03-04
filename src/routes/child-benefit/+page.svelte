@@ -56,9 +56,9 @@
 	.page-container {
 		max-width: 800px;
 		width: 100%;
-		margin: 0 auto; 
-		padding: 0 2em; 
-		box-sizing: border-box; 
+		margin: 0 auto;
+		padding: 0 2em;
+		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
 	}
@@ -80,8 +80,8 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1.5em;
-		flex: 1; 
-		min-height: 0; 
+		flex: 1;
+		min-height: 0;
 	}
 
 	.keyboard-collapsed-footer {

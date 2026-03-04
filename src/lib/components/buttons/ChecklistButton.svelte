@@ -92,5 +92,4 @@
 	.checklist-label input[type='checkbox']:checked + .checklist-custom::after {
 		display: block;
 	}
-
 </style>
