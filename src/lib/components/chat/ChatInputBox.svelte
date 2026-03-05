@@ -50,7 +50,7 @@
 
 <style>
 	.chat-input-wrapper {
-		padding: 0 1em 1.5em 1em;
+		padding: 0 1em 1em 1em;
 		background-color: #f5f5f5;
 		display: flex;
 		gap: 0.5rem;

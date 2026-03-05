@@ -12,8 +12,9 @@ export function extractFinalModelResponse(
 	isProactive?: boolean
 ): ElicitationResponse {
 	const eventArray = resData.response;
+	const isFirstMessage = resData.isFirstMessage;
 
-	if (isProactive) {
+	if (isProactive || isFirstMessage) {
 		if (Array.isArray(eventArray) && eventArray.length > 0) {
 			const firstTurn = eventArray[0];
 			if (firstTurn.content?.parts?.[0]?.text) {
@@ -25,7 +26,9 @@ export function extractFinalModelResponse(
 				};
 			}
 		}
-	} else {
+	}
+
+	if (!isProactive) {
 		if (!Array.isArray(eventArray))
 			return { content: 'There has been an error. Please try again.' };
 

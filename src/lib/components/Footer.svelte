@@ -33,4 +33,8 @@
 	.mobile-footer {
 		height: 0em;
 	}
+
+	.frame-footer {
+		height: 2.75em;
+	}
 </style>

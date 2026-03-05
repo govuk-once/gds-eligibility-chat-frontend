@@ -70,7 +70,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const responsePayload = {
 			response: agentResponse,
-			isProactiveInitial: isProactive && isFirstMessage
+			isProactiveInitial: isProactive && isFirstMessage,
+			isFirstMessage: isFirstMessage
 		};
 
 		return json(responsePayload);

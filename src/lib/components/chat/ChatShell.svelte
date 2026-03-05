@@ -7,7 +7,6 @@
 	import { chatState, sendMessage } from '$lib/chat.svelte';
 	import ChatInputActions from '$lib/components/chat/ChatInputActions.svelte';
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
-	import { isUserInputVaulted } from '$lib/utils/is-user-input-vaulted';
 
 	const {
 		footerClass: footerClassProp = '',
@@ -19,7 +18,7 @@
 		isFrameOn?: boolean;
 	}>();
 
-	const footerClass = $derived(footerClassProp || (isFrameOn ? 'keyboard-collapsed-footer' : ''));
+	const footerClass = $derived(footerClassProp || (isFrameOn ? 'frame-footer' : ''));
 
 	const hasActiveActionsAndNotStreaming = $derived(
 		chatState.activeActions.length > 0 &&
@@ -35,16 +34,6 @@
 		chatState.activeActions.length > 0 && hasActiveActionsAndNotStreaming
 			? 'Or something else ...'
 			: ''
-	);
-
-	const isCurrentInputVaulted = $derived(
-		(() => {
-			const lastAssistantMessage = [...chatState.messages]
-				.reverse()
-				.find((m) => m.role === 'assistant');
-
-			return isUserInputVaulted(lastAssistantMessage);
-		})()
 	);
 
 	$effect(() => {
@@ -112,18 +101,10 @@
 		<ChatGradient />
 	</div>
 
-	<div class="chat-wrapper" class:with-border={hasActiveActionsAndNotStreaming}>
+	<div class="chat-wrapper" class:expanded={hasActiveActionsAndNotStreaming}>
 		{#if hasActiveActionsAndNotStreaming}
 			<div class="extra-gap"></div>
 			<div class="extra-gap"></div>
-			{#if isCurrentInputVaulted}
-				<div class="privacy-note-wrapper">
-					<div class="privacy-note">
-						Stored in your private data vault
-						<img src="/icons/shield-check.svg" alt="" aria-hidden="true" class="privacy-icon" />
-					</div>
-				</div>
-			{/if}
 			<ChatInputActions
 				message={chatState.messages.at(-1)!}
 				displayedActions={chatState.activeActions}
@@ -185,36 +166,15 @@
 
 	.chat-wrapper {
 		box-sizing: border-box;
-		border: 1px solid transparent;
+		border: 1px solid black;
 		border-radius: 1.5em;
 		overflow: hidden;
 		position: relative;
+		padding-top: 1em;
 	}
 
-	.chat-wrapper.with-border {
-		padding-top: 0em;
+	.chat-wrapper.expanded {
+		padding-top: 0;
 		padding-bottom: 1em;
-		border-color: black;
-		margin-bottom: 0.5em;
-	}
-
-	.privacy-note-wrapper {
-		padding: 0 1em 0.5em 1em;
-		display: flex;
-		justify-content: flex-end; /* aligns content to the right */
-		align-items: center; /* vertically center the icon/text */
-	}
-
-	.privacy-note {
-		display: flex;
-		align-items: center;
-		font-size: 0.75em;
-		color: #aaaaaa;
-	}
-
-	.privacy-icon {
-		width: 1.25rem;
-		height: 1.25rem;
-		margin-left: 0.8em;
 	}
 </style>

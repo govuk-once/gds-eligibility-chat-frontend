@@ -4,7 +4,6 @@ import {
 	extractFinalModelResponse,
 	type ElicitationResponse
 } from './utils/extract-final-model-response';
-import { isUserInputVaulted } from '$lib/utils/is-user-input-vaulted';
 
 export const chatState = $state({
 	messages: [] as Message[],
@@ -21,15 +20,7 @@ export const chatState = $state({
 
 export function initializeChat(config: ChatSessionConfig = { isProactive: false }) {
 	chatState.config = config;
-	chatState.messages = config.isProactive
-		? []
-		: [
-				{
-					id: crypto.randomUUID(),
-					role: 'assistant',
-					html: '<p><b>Hi!</b> How can I help you today?</p>'
-				}
-			];
+	chatState.messages = [];
 	chatState.input = '';
 	chatState.loading = false;
 	chatState.sessionId = undefined;
@@ -37,7 +28,7 @@ export function initializeChat(config: ChatSessionConfig = { isProactive: false 
 	chatState.pendingActionPayload = undefined;
 }
 
-export async function handleProactiveSession() {
+export async function startSession() {
 	if (chatState.loading || chatState.sessionId) {
 		return;
 	}
@@ -164,11 +155,6 @@ function disablePreviousMessageActions() {
 	}
 }
 
-function shouldVault(): boolean {
-	const lastMessage = chatState.messages.at(-1);
-	return isUserInputVaulted(lastMessage);
-}
-
 export async function sendPayload(payload: string) {
 	if (chatState.loading) {
 		return;
@@ -179,8 +165,7 @@ export async function sendPayload(payload: string) {
 		{
 			id: crypto.randomUUID(),
 			role: 'user',
-			text: payload,
-			vault: shouldVault()
+			text: payload
 		}
 	];
 
@@ -200,8 +185,7 @@ export async function sendMessage() {
 		{
 			id: crypto.randomUUID(),
 			role: 'user',
-			text: payloadToSend,
-			vault: shouldVault()
+			text: payloadToSend
 		}
 	];
 	chatState.input = '';

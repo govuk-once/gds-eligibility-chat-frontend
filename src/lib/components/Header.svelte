@@ -7,7 +7,6 @@
 		isFrameOn?: boolean;
 	}>();
 
-	const vaultCount = $derived(chatState.messages.filter((m) => m.vault).length);
 	const isProactiveWebNoFrame = $derived(
 		chatState.config.isProactive && !device.isMobile && !isFrameOn
 	);
@@ -24,11 +23,6 @@
 					class="privacy-icon"
 				/>
 			</div>
-			{#if vaultCount > 0}
-				<div class="notification-dot">
-					<span>{vaultCount}</span>
-				</div>
-			{/if}
 		</div>
 	{/if}
 </header>
@@ -68,25 +62,5 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-	}
-
-	.notification-dot {
-		position: absolute;
-		top: 0;
-		right: 0;
-		width: 0.875em;
-		height: 0.875em;
-		background-color: black;
-		border-radius: 50%;
-		color: white;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.notification-dot span {
-		font-size: 0.6em;
-		font-weight: bold;
-		font-family: sans-serif;
 	}
 </style>

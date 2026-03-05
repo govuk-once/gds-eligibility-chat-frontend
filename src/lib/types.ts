@@ -21,8 +21,6 @@ export type Message = {
 	actions?: Action[];
 
 	streaming?: boolean;
-
-	vault?: boolean;
 };
 
 export interface ChatSessionConfig {
