@@ -18,5 +18,6 @@
 		border: 1px solid #595959;
 		border-radius: 0.5em;
 		cursor: pointer;
+		z-index: 100;
 	}
 </style>
