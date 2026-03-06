@@ -10,7 +10,7 @@
 	}>();
 </script>
 
-<div class="message {message.role} {message.vault ? 'vault' : ''}">
+<div class="message {message.role}">
 	<div class="message-content">
 		{#if message.role === 'assistant' && isLast && !loading && message.markdown}
 			<StreamingText messageId={message.id} content={message.markdown} stream={true} {onUpdate} />

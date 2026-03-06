@@ -105,7 +105,7 @@
 	}
 </script>
 
-<Header showVault={!chatState.config.isProactive} {isFrameOn} />
+<Header showIcons={!chatState.config.isProactive} {isFrameOn} />
 
 <div class="chat-container">
 	<div class="chat-main-area">

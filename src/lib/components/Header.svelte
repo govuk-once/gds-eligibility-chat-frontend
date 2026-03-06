@@ -2,8 +2,8 @@
 	import { chatState } from '$lib/chat.svelte';
 	import { device } from '$lib/device.svelte';
 
-	let { showVault = true, isFrameOn = false } = $props<{
-		showVault?: boolean;
+	let { showIcons = true, isFrameOn = false } = $props<{
+		showIcons?: boolean;
 		isFrameOn?: boolean;
 	}>();
 
@@ -11,16 +11,15 @@
 		chatState.config.isProactive && !device.isMobile && !isFrameOn
 	);
 </script>
-
 <header class:proactive-header={isProactiveWebNoFrame}>
-	{#if showVault}
-		<div class="vault-container">
-			<div class="shield-container">
+	{#if showIcons}
+		<div class="icon-container">
+			<div class="account-container">
 				<img
-					src="/icons/shield-check.svg"
-					alt="vault icon"
+					src="/icons/account-not-signed-in.svg"
+					alt="account not signed in"
 					aria-hidden="true"
-					class="privacy-icon"
+					class="account-icon"
 				/>
 			</div>
 		</div>
@@ -33,7 +32,6 @@
 		display: flex;
 		justify-content: flex-end;
 		align-items: flex-end;
-		padding: 0 0.5em;
 		background-color: #f5f5f5;
 	}
 
@@ -41,26 +39,28 @@
 		height: 1em;
 	}
 
-	.vault-container {
+	.icon-container {
 		position: relative;
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
 	}
 
-	.privacy-icon {
-		width: 1.4em;
-		height: 1.4em;
-	}
-
-	.shield-container {
-		width: 2.75em;
-		height: 2.75em;
+	.account-container {
+		width: 3.5em;
+		height: 3.5em;
 		border-radius: 50%;
 		background-color: white;
 		border: 1px solid black;
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		box-sizing: border-box;
+	}
+
+	.account-icon {
+		width: 2.75em;
+		height: 2.75em;
 	}
 </style>
+
