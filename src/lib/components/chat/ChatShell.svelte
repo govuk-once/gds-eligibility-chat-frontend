@@ -22,46 +22,38 @@
 
 	const lastMessage = $derived(chatState.messages.at(-1));
 
+	const isStreaming = $derived(lastMessage?.streaming);
+	
 	const messageWithActions = $derived.by(() => {
-		const lastSignIn = [...chatState.messages].reverse().find((m) => m.reply_type === 'sign_in');
-
-		if (chatState.showSignInForm) {
-			return lastSignIn;
+		const lastSignInPrompt = [...chatState.messages].reverse().find((m) => m.reply_type === 'sign_in');
+		if (chatState.showSignInForm || (chatState.loading && lastSignInPrompt)) {
+			return lastSignInPrompt;
 		}
-
-		// If we're loading and the last assistant message was sign_in, we're likely in transition
-		if (
-			chatState.loading &&
-			lastSignIn &&
-			lastSignIn === chatState.messages.findLast((m) => m.role === 'assistant')
-		) {
-			return lastSignIn;
-		}
-
 		return lastMessage;
 	});
 
+	const isSignInFlow = $derived(messageWithActions?.reply_type === 'sign_in');
+	const isFormVisible = $derived(chatState.showSignInForm);
+
 	const hasActiveActionsAndNotStreaming = $derived(
-		!chatState.loading &&
-			(chatState.activeActions.length > 0 ||
-				messageWithActions?.reply_type === 'sign_in' ||
-				chatState.showSignInForm) &&
-			messageWithActions &&
-			!messageWithActions.streaming
+		!!(
+			!chatState.loading &&
+			!isStreaming &&
+			(chatState.activeActions.length > 0 || isSignInFlow || isFormVisible) &&
+			messageWithActions
+		)
 	);
 
+	// The input box is hidden only during the confirmation phase ("Yes/No" buttons)
 	const isInputHidden = $derived(
-		!chatState.loading &&
-			messageWithActions?.reply_type === 'sign_in' &&
-			!chatState.showSignInForm &&
-			!messageWithActions.streaming
+		!!(!chatState.loading && !isStreaming && isSignInFlow && !isFormVisible)
 	);
 
 	const GRADIENT_RGB = '245, 245, 245';
 	const GRADIENT_MAX_OPACITY = 0.3;
 
 	let chatWindowEl: HTMLDivElement;
-	let chatInputBoxComponent: ChatInputBox;
+	let chatInputBoxComponent = $state<ChatInputBox>();
 	let thinkingText = $state('Thinking');
 
 	let wrapperHeight = $state(0);

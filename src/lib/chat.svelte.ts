@@ -186,26 +186,20 @@ export async function sendMessage() {
 	}
 
 	if (isFormSubmission) {
-		// For form submissions, we don't add a new user message because "Yes" is already there.
-		// We remove the transition assistant message.
-		chatState.messages = chatState.messages.filter(
-			(m) => m.html !== '<p>OK let me know your <b>username</b> and <b>password</b>.</p>'
-		);
+		// Remove transition assistant message by its stable ID
+		chatState.messages = chatState.messages.filter((m) => m.id !== 'sign-in-transition');
 
-		// Set signed in state
 		chatState.signedIn = true;
 
-		// Reset form state
+		// Reset form and input state
 		chatState.showSignInForm = false;
 		chatState.activeActions = [];
 		chatState.pendingActionPayload = undefined;
 		chatState.input = '';
 
 		const isFirstMessage = !chatState.sessionId;
-		// Send "Yes" to the agent as requested.
 		await postMessageAndHandleResponse('Yes', isFirstMessage);
 	} else {
-		// Normal message flow (including typing in the box while the form is shown)
 		disablePreviousMessageActions();
 		chatState.messages = [
 			...chatState.messages,

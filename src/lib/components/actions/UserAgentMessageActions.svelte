@@ -39,11 +39,10 @@
 		// Wait 1 second
 		await new Promise((resolve) => setTimeout(resolve, 1000));
 
-		// Add assistant message
 		chatState.messages = [
 			...chatState.messages,
 			{
-				id: crypto.randomUUID(),
+				id: 'sign-in-transition',
 				role: 'assistant',
 				html: '<p>OK let me know your <b>username</b> and <b>password</b>.</p>'
 			}
