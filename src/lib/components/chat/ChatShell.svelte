@@ -20,10 +20,41 @@
 
 	const footerClass = $derived(footerClassProp || (isFrameOn ? 'frame-footer' : ''));
 
+	const lastMessage = $derived(chatState.messages.at(-1));
+
+	const messageWithActions = $derived.by(() => {
+		const lastSignIn = [...chatState.messages].reverse().find((m) => m.reply_type === 'sign_in');
+
+		if (chatState.showSignInForm) {
+			return lastSignIn;
+		}
+
+		// If we're loading and the last assistant message was sign_in, we're likely in transition
+		if (
+			chatState.loading &&
+			lastSignIn &&
+			lastSignIn === chatState.messages.findLast((m) => m.role === 'assistant')
+		) {
+			return lastSignIn;
+		}
+
+		return lastMessage;
+	});
+
 	const hasActiveActionsAndNotStreaming = $derived(
-		chatState.activeActions.length > 0 &&
-			chatState.messages.at(-1) &&
-			!chatState.messages.at(-1)?.streaming
+		!chatState.loading &&
+			(chatState.activeActions.length > 0 ||
+				messageWithActions?.reply_type === 'sign_in' ||
+				chatState.showSignInForm) &&
+			messageWithActions &&
+			!messageWithActions.streaming
+	);
+
+	const isInputHidden = $derived(
+		!chatState.loading &&
+			messageWithActions?.reply_type === 'sign_in' &&
+			!chatState.showSignInForm &&
+			!messageWithActions.streaming
 	);
 
 	const GRADIENT_RGB = '245, 245, 245';
@@ -38,7 +69,7 @@
 	let gradientHeight = $state(0);
 
 	let placeholderText = $derived(
-		chatState.activeActions.length > 0 && hasActiveActionsAndNotStreaming
+		hasActiveActionsAndNotStreaming
 			? 'Or something else ...'
 			: ''
 	);
@@ -114,7 +145,7 @@
 				<div class="chat-top-spacer"></div>
 
 				{#each chatState.messages as m, i (m.id)}
-					{#if !(chatState.loading && i === chatState.messages.length - 1)}
+					{#if !(chatState.loading && i === chatState.messages.length - 1 && m.role === 'assistant')}
 						<ChatMessage
 							message={m}
 							isLast={i === chatState.messages.length - 1}
@@ -175,25 +206,31 @@
 				style:bottom="-{footerHeight}px"
 			></div>
 
-			<div class="chat-wrapper" class:expanded={hasActiveActionsAndNotStreaming}>
-				{#if hasActiveActionsAndNotStreaming}
+			<div
+				class="chat-wrapper"
+				class:expanded={hasActiveActionsAndNotStreaming}
+				class:no-bottom-padding={isInputHidden}
+			>
+				{#if hasActiveActionsAndNotStreaming && messageWithActions}
 					<div class="extra-gap"></div>
 					<div class="extra-gap"></div>
 					<ChatInputActions
-						message={chatState.messages.at(-1)!}
+						message={messageWithActions}
 						displayedActions={chatState.activeActions}
 					/>
 					<div class="extra-gap"></div>
 				{/if}
 
-				<ChatInputBox
-					bind:this={chatInputBoxComponent}
-					bind:value={chatState.input}
-					loading={chatState.loading}
-					onSend={handleSend}
-					placeholder={placeholderText}
-					{hasActiveActionsAndNotStreaming}
-				/>
+				{#if !isInputHidden}
+					<ChatInputBox
+						bind:this={chatInputBoxComponent}
+						bind:value={chatState.input}
+						loading={chatState.loading}
+						onSend={handleSend}
+						placeholder={placeholderText}
+						{hasActiveActionsAndNotStreaming}
+					/>
+				{/if}
 			</div>
 		</div>
 	</div>
@@ -312,5 +349,9 @@
 	.chat-wrapper.expanded {
 		padding-top: 0;
 		padding-bottom: 1em;
+	}
+
+	.chat-wrapper.expanded.no-bottom-padding {
+		padding-bottom: 0;
 	}
 </style>

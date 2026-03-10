@@ -10,7 +10,7 @@ export type Message = {
 
 	source?: 'user_agent' | 'benefit_agent';
 
-	reply_type?: 'yes_no' | 'choice_multiple' | 'choice_single' | 'free_text' | 'none';
+	reply_type?: 'yes_no' | 'choice_multiple' | 'choice_single' | 'sign_in' | 'free_text' | 'none';
 
 	text?: string;
 

@@ -12,6 +12,8 @@ export const chatState = $state({
 	sessionId: undefined as string | undefined,
 	activeActions: [] as Action[],
 	pendingActionPayload: undefined as string | undefined,
+	showSignInForm: false,
+	signedIn: false,
 	config: {
 		isProactive: false,
 		ageGroup: undefined
@@ -26,6 +28,8 @@ export function initializeChat(config: ChatSessionConfig = { isProactive: false 
 	chatState.sessionId = undefined;
 	chatState.activeActions = [];
 	chatState.pendingActionPayload = undefined;
+	chatState.showSignInForm = false;
+	chatState.signedIn = false;
 }
 
 export async function startSession() {
@@ -147,10 +151,11 @@ export async function finishedStreaming(messageId: string, finalMarkdown: string
 function disablePreviousMessageActions() {
 	if (chatState.messages.length > 0) {
 		const lastMessage = chatState.messages.at(-1);
-		if (lastMessage && lastMessage.role === 'assistant' && lastMessage.actions) {
+		if (lastMessage && lastMessage.role === 'assistant') {
 			lastMessage.actions = [];
 			chatState.activeActions = [];
 			chatState.pendingActionPayload = undefined;
+			chatState.showSignInForm = false;
 		}
 	}
 }
@@ -173,25 +178,47 @@ export async function sendPayload(payload: string) {
 }
 
 export async function sendMessage() {
+	const isFormSubmission = !!chatState.pendingActionPayload && chatState.showSignInForm;
 	const payloadToSend = chatState.pendingActionPayload || chatState.input.trim();
 
 	if (!payloadToSend || chatState.loading) {
 		return;
 	}
 
-	disablePreviousMessageActions();
-	chatState.messages = [
-		...chatState.messages,
-		{
-			id: crypto.randomUUID(),
-			role: 'user',
-			text: payloadToSend
-		}
-	];
-	chatState.input = '';
-	chatState.pendingActionPayload = undefined;
+	if (isFormSubmission) {
+		// For form submissions, we don't add a new user message because "Yes" is already there.
+		// We remove the transition assistant message.
+		chatState.messages = chatState.messages.filter(
+			(m) => m.html !== '<p>OK let me know your <b>username</b> and <b>password</b>.</p>'
+		);
 
-	const isFirstMessage = !chatState.sessionId;
+		// Set signed in state
+		chatState.signedIn = true;
 
-	await postMessageAndHandleResponse(payloadToSend, isFirstMessage);
+		// Reset form state
+		chatState.showSignInForm = false;
+		chatState.activeActions = [];
+		chatState.pendingActionPayload = undefined;
+		chatState.input = '';
+
+		const isFirstMessage = !chatState.sessionId;
+		// Send "Yes" to the agent as requested.
+		await postMessageAndHandleResponse('Yes', isFirstMessage);
+	} else {
+		// Normal message flow (including typing in the box while the form is shown)
+		disablePreviousMessageActions();
+		chatState.messages = [
+			...chatState.messages,
+			{
+				id: crypto.randomUUID(),
+				role: 'user',
+				text: payloadToSend
+			}
+		];
+		chatState.input = '';
+		chatState.pendingActionPayload = undefined;
+
+		const isFirstMessage = !chatState.sessionId;
+		await postMessageAndHandleResponse(payloadToSend, isFirstMessage);
+	}
 }
