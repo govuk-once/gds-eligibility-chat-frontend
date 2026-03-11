@@ -4,6 +4,7 @@ import {
 	extractFinalModelResponse,
 	type ElicitationResponse
 } from './utils/extract-final-model-response';
+import { authJourney, resetAuthState, authState } from './auth-journey.svelte';
 
 export const chatState = $state({
 	messages: [] as Message[],
@@ -12,8 +13,6 @@ export const chatState = $state({
 	sessionId: undefined as string | undefined,
 	activeActions: [] as Action[],
 	pendingActionPayload: undefined as string | undefined,
-	showSignInForm: false,
-	signedIn: false,
 	config: {
 		isProactive: false,
 		ageGroup: undefined
@@ -28,8 +27,7 @@ export function initializeChat(config: ChatSessionConfig = { isProactive: false 
 	chatState.sessionId = undefined;
 	chatState.activeActions = [];
 	chatState.pendingActionPayload = undefined;
-	chatState.showSignInForm = false;
-	chatState.signedIn = false;
+	resetAuthState();
 }
 
 export async function startSession() {
@@ -60,7 +58,7 @@ export async function startSession() {
 	await postMessageAndHandleResponse(message, isFirstMessage);
 }
 
-async function postMessageAndHandleResponse(message: string, isFirstMessage: boolean) {
+export async function postMessageAndHandleResponse(message: string, isFirstMessage: boolean) {
 	chatState.loading = true;
 	const assistantMessageId = crypto.randomUUID();
 	chatState.messages = [
@@ -100,19 +98,25 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 		const source = finalResponse.source;
 		const reply_type = finalResponse.reply_type;
 
-		const safeHtml = await markdownToHtml(finalResponse.content);
+		// Delegate sign-in logic to authJourney
+		const { contentToDisplay, finalReplyType } = authJourney.interceptResponse(
+			reply_type || 'free_text',
+			finalResponse.content
+		);
+
+		const safeHtml = await markdownToHtml(contentToDisplay);
 
 		const assistantMessage = chatState.messages.find((m) => m.id === assistantMessageId);
 		if (assistantMessage) {
-			assistantMessage.markdown = finalResponse.content;
+			assistantMessage.markdown = contentToDisplay;
 			assistantMessage.source = source || 'user_agent';
-			assistantMessage.reply_type = reply_type || 'free_text';
+			assistantMessage.reply_type = finalReplyType;
 			if (safeHtml) {
 				assistantMessage.html = safeHtml;
 			} else {
 				assistantMessage.html = 'Received a non-text response from the agent.';
 			}
-			if (actions && actions.length > 0) {
+			if (actions && actions.length > 0 && !authState.showSignInForm) {
 				assistantMessage.actions = actions;
 				chatState.activeActions = actions;
 			} else {
@@ -138,6 +142,7 @@ async function postMessageAndHandleResponse(message: string, isFirstMessage: boo
 		chatState.loading = false;
 	}
 }
+
 export async function finishedStreaming(messageId: string, finalMarkdown: string) {
 	const message = chatState.messages.find((m) => m.id === messageId);
 	if (message) {
@@ -155,7 +160,7 @@ function disablePreviousMessageActions() {
 			lastMessage.actions = [];
 			chatState.activeActions = [];
 			chatState.pendingActionPayload = undefined;
-			chatState.showSignInForm = false;
+			authState.showSignInForm = false;
 		}
 	}
 }
@@ -165,6 +170,11 @@ export async function sendPayload(payload: string) {
 		return;
 	}
 	disablePreviousMessageActions();
+
+	if (payload === 'no') {
+		authState.inSignInJourney = false;
+	}
+
 	chatState.messages = [
 		...chatState.messages,
 		{
@@ -178,27 +188,25 @@ export async function sendPayload(payload: string) {
 }
 
 export async function sendMessage() {
-	const isFormSubmission = !!chatState.pendingActionPayload && chatState.showSignInForm;
+	const lastMessage = chatState.messages.at(-1);
+	const isSignInPromptVisible = lastMessage?.reply_type === 'sign_in' && !authState.showSignInForm;
+
+	const isFormSubmission = !!chatState.pendingActionPayload && authState.showSignInForm;
 	const payloadToSend = chatState.pendingActionPayload || chatState.input.trim();
 
 	if (!payloadToSend || chatState.loading) {
 		return;
 	}
 
+	if (isSignInPromptVisible && payloadToSend === 'Yes') {
+		await authJourney.handleSignInYes();
+		return;
+	}
+
 	if (isFormSubmission) {
-		// Remove transition assistant message by its stable ID
-		chatState.messages = chatState.messages.filter((m) => m.id !== 'sign-in-transition');
-
-		chatState.signedIn = true;
-
-		// Reset form and input state
-		chatState.showSignInForm = false;
-		chatState.activeActions = [];
-		chatState.pendingActionPayload = undefined;
-		chatState.input = '';
-
+		const finalMessage = await authJourney.completeSignIn();
 		const isFirstMessage = !chatState.sessionId;
-		await postMessageAndHandleResponse('Yes', isFirstMessage);
+		await postMessageAndHandleResponse(finalMessage, isFirstMessage);
 	} else {
 		disablePreviousMessageActions();
 		chatState.messages = [

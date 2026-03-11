@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { chatState } from '$lib/chat.svelte';
+	import { authState } from '$lib/auth-journey.svelte';
 	import { device } from '$lib/device.svelte';
 
 	let { showIcons = true, isFrameOn = false } = $props<{
@@ -11,16 +12,22 @@
 		chatState.config.isProactive && !device.isMobile && !isFrameOn
 	);
 </script>
+
 <header class:proactive-header={isProactiveWebNoFrame}>
 	{#if showIcons}
 		<div class="icon-container">
 			<div class="account-container">
 				<img
-					src="/icons/account-not-signed-in.svg"
-					alt="account not signed in"
+					src={authState.signedIn
+						? '/icons/account-signed-in.svg'
+						: '/icons/account-not-signed-in.svg'}
+					alt={authState.signedIn ? 'account signed in' : 'account not signed in'}
 					aria-hidden="true"
 					class="account-icon"
 				/>
+				{#if authState.signedIn}
+					<img src="/icons/notepad.svg" alt="notepad" aria-hidden="true" class="account-icon" />
+				{/if}
 			</div>
 		</div>
 	{/if}
@@ -47,15 +54,17 @@
 	}
 
 	.account-container {
-		width: 3.5em;
 		height: 3.5em;
-		border-radius: 50%;
+		min-width: 3.5em;
+		border-radius: 1.75em;
 		background-color: white;
 		border: 1px solid black;
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		box-sizing: border-box;
+		padding: 0 0.375em;
+		gap: 1em;
 	}
 
 	.account-icon {
@@ -63,4 +72,3 @@
 		height: 2.75em;
 	}
 </style>
-

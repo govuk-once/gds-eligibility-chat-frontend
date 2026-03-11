@@ -14,19 +14,19 @@
 </script>
 
 <div class="signin-container">
-		<div class="field">
-			<label for="username">Username:</label>
-			<div class="input-wrapper">
-				<input type="text" id="username" bind:value={username} autocomplete="username" />
-			</div>
-		</div>
-		<div class="field">
-			<label for="password">Password:</label>
-			<div class="input-wrapper">
-				<input type="password" id="password" bind:value={password} autocomplete="current-password" />
-			</div>
+	<div class="field">
+		<label for="username">Username:</label>
+		<div class="input-wrapper">
+			<input type="text" id="username" bind:value={username} autocomplete="username" />
 		</div>
 	</div>
+	<div class="field">
+		<label for="password">Password:</label>
+		<div class="input-wrapper">
+			<input type="password" id="password" bind:value={password} autocomplete="current-password" />
+		</div>
+	</div>
+</div>
 
 <style>
 	.signin-container {

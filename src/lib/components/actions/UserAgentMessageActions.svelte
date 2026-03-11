@@ -1,11 +1,13 @@
 <script lang="ts">
 	import type { Message, Action } from '$lib/types';
 	import { chatState, sendPayload } from '$lib/chat.svelte';
+	import { authState } from '$lib/auth-journey.svelte';
 	import Button from '$lib/components/buttons/Button.svelte';
 	import DoubleButton from '$lib/components/buttons/DoubleButton.svelte';
 	import ActionsLayout from '$lib/components/actions/ActionsLayout.svelte';
 	import ChecklistButton from '$lib/components/buttons/ChecklistButton.svelte';
 	import SignIn from '$lib/components/sign-in/SignIn.svelte';
+	import RadioButton from '$lib/components/buttons/RadioButton.svelte';
 
 	let { message, displayedActions } = $props<{
 		message: Message;
@@ -22,36 +24,10 @@
 		}
 	});
 
-	async function handleYesClick() {
-		// Add user message immediately
-		chatState.messages = [
-			...chatState.messages,
-			{
-				id: crypto.randomUUID(),
-				role: 'user',
-				text: 'Yes'
-			}
-		];
-
-		// Show thinking animation
-		chatState.loading = true;
-
-		// Wait 1 second
-		await new Promise((resolve) => setTimeout(resolve, 1000));
-
-		chatState.messages = [
-			...chatState.messages,
-			{
-				id: 'sign-in-transition',
-				role: 'assistant',
-				html: '<p>OK let me know your <b>username</b> and <b>password</b>.</p>'
-			}
-		];
-
-		// Hide thinking animation and show sign in form
-		chatState.loading = false;
-		chatState.showSignInForm = true;
-	}
+	const signInActions: Action[] = [
+		{ label: 'Yes', payload: 'Yes' },
+		{ label: 'No', payload: 'no' }
+	];
 </script>
 
 <ActionsLayout>
@@ -79,9 +55,9 @@
 			</ActionsLayout>
 		{/if}
 	{:else if message.reply_type === 'sign_in'}
-		{#if !chatState.showSignInForm}
+		{#if !authState.showSignInForm}
 			{#if !chatState.loading}
-				<DoubleButton yesLabel="Yes" onYesClick={handleYesClick} noLabel="No" onNoClick={() => sendPayload('no')} />
+				<RadioButton actions={signInActions} />
 			{/if}
 		{:else}
 			<SignIn />

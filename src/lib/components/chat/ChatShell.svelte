@@ -5,6 +5,7 @@
 	import ChatGradient from '$lib/components/chat/ChatGradient.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { chatState, sendMessage } from '$lib/chat.svelte';
+	import { authState } from '$lib/auth-journey.svelte';
 	import ChatInputActions from '$lib/components/chat/ChatInputActions.svelte';
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
 
@@ -23,17 +24,19 @@
 	const lastMessage = $derived(chatState.messages.at(-1));
 
 	const isStreaming = $derived(lastMessage?.streaming);
-	
+
 	const messageWithActions = $derived.by(() => {
-		const lastSignInPrompt = [...chatState.messages].reverse().find((m) => m.reply_type === 'sign_in');
-		if (chatState.showSignInForm || (chatState.loading && lastSignInPrompt)) {
+		const lastSignInPrompt = [...chatState.messages]
+			.reverse()
+			.find((m) => m.reply_type === 'sign_in');
+		if (authState.showSignInForm || (chatState.loading && lastSignInPrompt)) {
 			return lastSignInPrompt;
 		}
 		return lastMessage;
 	});
 
 	const isSignInFlow = $derived(messageWithActions?.reply_type === 'sign_in');
-	const isFormVisible = $derived(chatState.showSignInForm);
+	const isFormVisible = $derived(authState.showSignInForm);
 
 	const hasActiveActionsAndNotStreaming = $derived(
 		!!(
@@ -42,11 +45,6 @@
 			(chatState.activeActions.length > 0 || isSignInFlow || isFormVisible) &&
 			messageWithActions
 		)
-	);
-
-	// The input box is hidden only during the confirmation phase ("Yes/No" buttons)
-	const isInputHidden = $derived(
-		!!(!chatState.loading && !isStreaming && isSignInFlow && !isFormVisible)
 	);
 
 	const GRADIENT_RGB = '245, 245, 245';
@@ -60,11 +58,7 @@
 	let footerHeight = $state(0);
 	let gradientHeight = $state(0);
 
-	let placeholderText = $derived(
-		hasActiveActionsAndNotStreaming
-			? 'Or something else ...'
-			: ''
-	);
+	let placeholderText = $derived(hasActiveActionsAndNotStreaming ? 'Or something else ...' : '');
 
 	$effect(() => {
 		if (!chatState.loading) return;
@@ -170,11 +164,7 @@
 			<Footer class={footerClass} {isFrameOn} />
 		</div>
 
-		<div
-			class="wrapper-layer"
-			style:bottom="{footerHeight}px"
-			bind:clientHeight={wrapperHeight}
-		>
+		<div class="wrapper-layer" style:bottom="{footerHeight}px" bind:clientHeight={wrapperHeight}>
 			<div
 				class="bottom-background-gradient"
 				style:height="{footerHeight + wrapperHeight}px"
@@ -184,11 +174,7 @@
 
 			<div class="gradient-layer-container">
 				<div bind:clientHeight={gradientHeight}>
-					<ChatGradient
-						position="static"
-						rgb={GRADIENT_RGB}
-						maxOpacity={GRADIENT_MAX_OPACITY}
-					/>
+					<ChatGradient position="static" rgb={GRADIENT_RGB} maxOpacity={GRADIENT_MAX_OPACITY} />
 				</div>
 			</div>
 
@@ -198,11 +184,7 @@
 				style:bottom="-{footerHeight}px"
 			></div>
 
-			<div
-				class="chat-wrapper"
-				class:expanded={hasActiveActionsAndNotStreaming}
-				class:no-bottom-padding={isInputHidden}
-			>
+			<div class="chat-wrapper" class:expanded={hasActiveActionsAndNotStreaming}>
 				{#if hasActiveActionsAndNotStreaming && messageWithActions}
 					<div class="extra-gap"></div>
 					<div class="extra-gap"></div>
@@ -213,16 +195,14 @@
 					<div class="extra-gap"></div>
 				{/if}
 
-				{#if !isInputHidden}
-					<ChatInputBox
-						bind:this={chatInputBoxComponent}
-						bind:value={chatState.input}
-						loading={chatState.loading}
-						onSend={handleSend}
-						placeholder={placeholderText}
-						{hasActiveActionsAndNotStreaming}
-					/>
-				{/if}
+				<ChatInputBox
+					bind:this={chatInputBoxComponent}
+					bind:value={chatState.input}
+					loading={chatState.loading}
+					onSend={handleSend}
+					placeholder={placeholderText}
+					{hasActiveActionsAndNotStreaming}
+				/>
 			</div>
 		</div>
 	</div>
@@ -341,9 +321,5 @@
 	.chat-wrapper.expanded {
 		padding-top: 0;
 		padding-bottom: 1em;
-	}
-
-	.chat-wrapper.expanded.no-bottom-padding {
-		padding-bottom: 0;
 	}
 </style>
