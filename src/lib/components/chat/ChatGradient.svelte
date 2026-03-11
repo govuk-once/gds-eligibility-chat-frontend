@@ -23,7 +23,7 @@
 <div
 	class="chat-gradient"
 	style:bottom={bottomStyle}
-	style:position={position}
+	style:position
 	style:background-image={backgroundStyle}
 ></div>
 

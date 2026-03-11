@@ -48,7 +48,7 @@
 	);
 
 	const GRADIENT_RGB = '245, 245, 245';
-	const GRADIENT_MAX_OPACITY = 0.3;
+	const GRADIENT_MAX_OPACITY = 0.9;
 
 	let chatWindowEl: HTMLDivElement;
 	let chatInputBoxComponent = $state<ChatInputBox>();
@@ -57,6 +57,7 @@
 	let wrapperHeight = $state(0);
 	let footerHeight = $state(0);
 	let gradientHeight = $state(0);
+	let headerHeight = $state(0);
 
 	let placeholderText = $derived(hasActiveActionsAndNotStreaming ? 'Or something else ...' : '');
 
@@ -105,7 +106,9 @@
 		if (chatWindowEl && (wasAtBottom || chatState.loading)) {
 			// Use requestAnimationFrame to ensure the browser has processed the layout shift
 			requestAnimationFrame(() => {
-				chatWindowEl.scrollTop = chatWindowEl.scrollHeight;
+				if (chatWindowEl) {
+					chatWindowEl.scrollTop = chatWindowEl.scrollHeight;
+				}
 			});
 		}
 	});
@@ -117,18 +120,22 @@
 
 	function handleStreamUpdate() {
 		requestAnimationFrame(() => {
-			chatWindowEl.scrollTop = chatWindowEl.scrollHeight;
+			if (chatWindowEl) {
+				chatWindowEl.scrollTop = chatWindowEl.scrollHeight;
+			}
 		});
 	}
 </script>
 
-<Header showIcons={!chatState.config.isProactive} {isFrameOn} />
-
 <div class="chat-container">
 	<div class="chat-main-area">
+		<div class="header-layer background">
+			<Header showIcons={false} {isFrameOn} />
+		</div>
+
 		<div class="chat-window" use:autoScroll bind:this={chatWindowEl}>
 			<div class="chat-messages-container">
-				<div class="chat-top-spacer"></div>
+				<div class="chat-top-spacer" style:height="calc({headerHeight}px + 1em)"></div>
 
 				{#each chatState.messages as m, i (m.id)}
 					{#if !(chatState.loading && i === chatState.messages.length - 1 && m.role === 'assistant')}
@@ -160,6 +167,10 @@
 			></div>
 		</div>
 
+		<div class="header-layer icons" bind:clientHeight={headerHeight}>
+			<Header showIcons={!chatState.config.isProactive} showBackground={false} {isFrameOn} />
+		</div>
+
 		<div class="footer-layer" bind:clientHeight={footerHeight}>
 			<Footer class={footerClass} {isFrameOn} />
 		</div>
@@ -177,12 +188,6 @@
 					<ChatGradient position="static" rgb={GRADIENT_RGB} maxOpacity={GRADIENT_MAX_OPACITY} />
 				</div>
 			</div>
-
-			<div
-				class="blur-layer"
-				style:height="{footerHeight + wrapperHeight + gradientHeight}px"
-				style:bottom="-{footerHeight}px"
-			></div>
 
 			<div class="chat-wrapper" class:expanded={hasActiveActionsAndNotStreaming}>
 				{#if hasActiveActionsAndNotStreaming && messageWithActions}
@@ -227,8 +232,27 @@
 		min-height: 0;
 	}
 
+	.header-layer {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		pointer-events: none;
+	}
+
+	.header-layer.background {
+		z-index: 21;
+	}
+
+	.header-layer.icons {
+		z-index: 25;
+	}
+
+	.header-layer :global(*) {
+		pointer-events: auto;
+	}
+
 	.chat-top-spacer {
-		height: 1.5em;
 		flex-shrink: 0;
 	}
 
@@ -252,8 +276,11 @@
 	.chat-messages-container {
 		display: flex;
 		flex-direction: column;
-		gap: 1.5em; /* gap between items in chat window */
 		position: relative;
+	}
+
+	.chat-messages-container > :global(.message + .message) {
+		margin-top: 1.5em;
 	}
 
 	.extra-gap {
@@ -293,18 +320,6 @@
 		width: 100%;
 		pointer-events: none;
 		z-index: 3;
-	}
-
-	.blur-layer {
-		position: absolute;
-		left: 0;
-		right: 0;
-		z-index: 2;
-		pointer-events: none;
-		backdrop-filter: blur(16px);
-		-webkit-backdrop-filter: blur(16px);
-		mask-image: linear-gradient(to bottom, transparent, black);
-		-webkit-mask-image: linear-gradient(to bottom, transparent, black);
 	}
 
 	.chat-wrapper {

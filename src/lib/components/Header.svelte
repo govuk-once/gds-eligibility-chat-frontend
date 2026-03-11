@@ -3,9 +3,14 @@
 	import { authState } from '$lib/auth-journey.svelte';
 	import { device } from '$lib/device.svelte';
 
-	let { showIcons = true, isFrameOn = false } = $props<{
+	let {
+		showIcons = true,
+		isFrameOn = false,
+		showBackground = true
+	} = $props<{
 		showIcons?: boolean;
 		isFrameOn?: boolean;
+		showBackground?: boolean;
 	}>();
 
 	const isProactiveWebNoFrame = $derived(
@@ -13,9 +18,10 @@
 	);
 </script>
 
-<header class:proactive-header={isProactiveWebNoFrame}>
-	{#if showIcons}
-		<div class="icon-container">
+<header class:proactive-header={isProactiveWebNoFrame} class:with-background={showBackground}>
+	<div class="upper-header"></div>
+	<div class="lower-header">
+		<div class="icon-container" style:visibility={showIcons ? 'visible' : 'hidden'}>
 			<div class="account-container">
 				<img
 					src={authState.signedIn
@@ -30,20 +36,54 @@
 				{/if}
 			</div>
 		</div>
-	{/if}
+	</div>
 </header>
 
 <style>
 	header {
-		height: 6.625em;
 		display: flex;
-		justify-content: flex-end;
-		align-items: flex-end;
-		background-color: #f5f5f5;
+		flex-direction: column;
+		position: relative;
 	}
 
 	header.proactive-header {
 		height: 1em;
+	}
+
+	header.with-background .upper-header {
+		background-color: rgba(245, 245, 245, 0.9);
+	}
+
+	header.with-background .lower-header {
+		background: linear-gradient(
+			to bottom,
+			rgba(245, 245, 245, 0.9) 0%,
+			rgba(245, 245, 245, 0) 100%
+		);
+	}
+
+	.upper-header {
+		height: 3.875em;
+		position: relative;
+		z-index: 2;
+	}
+
+	header.proactive-header .upper-header {
+		display: none;
+	}
+
+	.lower-header {
+		height: 3.5em;
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		position: relative;
+		z-index: 2;
+	}
+
+	header.proactive-header .lower-header {
+		height: 100%;
+		align-items: flex-end;
 	}
 
 	.icon-container {
@@ -51,6 +91,7 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5em;
+		z-index: 25;
 	}
 
 	.account-container {
