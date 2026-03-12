@@ -8,7 +8,7 @@
 	import { authState } from '$lib/auth-journey.svelte';
 	import ChatInputActions from '$lib/components/chat/ChatInputActions.svelte';
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
-	import NotepadOverlay from '$lib/components/mock/NotepadOverlay.svelte';
+	import NotepadOverlay from '$lib/components/notepad/NotepadOverlay.svelte';
 
 	const {
 		footerClass: footerClassProp = '',

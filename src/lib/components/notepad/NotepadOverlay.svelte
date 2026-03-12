@@ -55,8 +55,8 @@
 
 	img {
 		display: block;
-		margin: 0 auto;
-		max-width: 90%;
+		margin: 0 1em;
+		width: calc(100% - 2em);
 		height: auto;
 		flex-shrink: 0;
 	}
