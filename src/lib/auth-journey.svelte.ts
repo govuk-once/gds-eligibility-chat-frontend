@@ -4,13 +4,15 @@ import { chatState } from './chat.svelte';
 export const authState = $state({
 	inSignInJourney: false,
 	showSignInForm: false,
-	signedIn: false
+	signedIn: false,
+	notepadClicked: false
 });
 
 export function resetAuthState() {
 	authState.inSignInJourney = false;
 	authState.showSignInForm = false;
 	authState.signedIn = false;
+	authState.notepadClicked = false;
 }
 
 export const authJourney = {

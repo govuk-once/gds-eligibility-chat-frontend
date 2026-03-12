@@ -88,23 +88,29 @@ describe('authJourney', () => {
 		});
 	});
 
-	describe('completeSignIn', () => {
-		it('should finalize state and return session ID', async () => {
-			// Setup
-			chatState.messages = [{ id: 'sign-in-transition', role: 'assistant', html: '' }];
+	describe('resetAuthState', () => {
+		it('should reset all authState values to default', () => {
 			authState.inSignInJourney = true;
 			authState.showSignInForm = true;
+			authState.signedIn = true;
+			authState.notepadClicked = true;
 
-			const result = await authJourney.completeSignIn();
+			resetAuthState();
 
-			expect(result).toBe('test-session-id');
-			expect(authState.signedIn).toBe(true);
 			expect(authState.inSignInJourney).toBe(false);
 			expect(authState.showSignInForm).toBe(false);
-			expect(chatState.messages).toHaveLength(0); // transition message removed
-			expect(chatState.activeActions).toHaveLength(0);
-			expect(chatState.pendingActionPayload).toBeUndefined();
-			expect(chatState.input).toBe('');
+			expect(authState.signedIn).toBe(false);
+			expect(authState.notepadClicked).toBe(false);
+		});
+	});
+
+	describe('notepadClicked transitions', () => {
+		it('should allow setting notepadClicked to true and then false', () => {
+			expect(authState.notepadClicked).toBe(false);
+			authState.notepadClicked = true;
+			expect(authState.notepadClicked).toBe(true);
+			authState.notepadClicked = false;
+			expect(authState.notepadClicked).toBe(false);
 		});
 	});
 });

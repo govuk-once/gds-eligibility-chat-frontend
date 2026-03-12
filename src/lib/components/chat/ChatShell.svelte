@@ -8,6 +8,7 @@
 	import { authState } from '$lib/auth-journey.svelte';
 	import ChatInputActions from '$lib/components/chat/ChatInputActions.svelte';
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
+	import NotepadOverlay from '$lib/components/mock/NotepadOverlay.svelte';
 
 	const {
 		footerClass: footerClassProp = '',
@@ -167,9 +168,17 @@
 			></div>
 		</div>
 
-		<div class="header-layer icons" bind:clientHeight={headerHeight}>
-			<Header showIcons={!chatState.config.isProactive} showBackground={false} {isFrameOn} />
+		<div class="header-layer icons">
+			<div bind:clientHeight={headerHeight}>
+				<Header showIcons={!chatState.config.isProactive} showBackground={false} {isFrameOn} />
+			</div>
 		</div>
+
+		{#if authState.notepadClicked}
+			<div class="notepad-overlay-layer">
+				<NotepadOverlay {headerHeight} {footerHeight} />
+			</div>
+		{/if}
 
 		<div class="footer-layer" bind:clientHeight={footerHeight}>
 			<Footer class={footerClass} {isFrameOn} />
@@ -245,7 +254,16 @@
 	}
 
 	.header-layer.icons {
-		z-index: 25;
+		z-index: 100;
+	}
+
+	.notepad-overlay-layer {
+		position: absolute;
+		top: 0;
+		left: -1em; /* Cover the 1em padding of app-container */
+		right: -1em;
+		bottom: 0;
+		z-index: 90;
 	}
 
 	.header-layer :global(*) {

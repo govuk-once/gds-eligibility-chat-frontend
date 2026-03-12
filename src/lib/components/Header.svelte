@@ -21,6 +21,19 @@
 <header class:proactive-header={isProactiveWebNoFrame} class:with-background={showBackground}>
 	<div class="upper-header"></div>
 	<div class="lower-header">
+		<div class="left-icon-container" style:visibility={showIcons ? 'visible' : 'hidden'}>
+			{#if authState.notepadClicked}
+				<div class="back-arrow-container">
+					<button
+						onclick={() => (authState.notepadClicked = false)}
+						class="icon-button"
+						aria-label="go back"
+					>
+						<img src="/icons/back-arrow.svg" alt="back" aria-hidden="true" class="account-icon" />
+					</button>
+				</div>
+			{/if}
+		</div>
 		<div class="icon-container" style:visibility={showIcons ? 'visible' : 'hidden'}>
 			<div class="account-container">
 				<img
@@ -32,7 +45,18 @@
 					class="account-icon"
 				/>
 				{#if authState.signedIn}
-					<img src="/icons/notepad.svg" alt="notepad" aria-hidden="true" class="account-icon" />
+					<button
+						onclick={() => (authState.notepadClicked = !authState.notepadClicked)}
+						class="icon-button"
+						disabled={authState.notepadClicked}
+					>
+						<img
+							src={authState.notepadClicked ? '/icons/notepad-clicked.svg' : '/icons/notepad.svg'}
+							alt="notepad"
+							aria-hidden="true"
+							class="account-icon"
+						/>
+					</button>
 				{/if}
 			</div>
 		</div>
@@ -75,7 +99,7 @@
 	.lower-header {
 		height: 3.5em;
 		display: flex;
-		justify-content: flex-end;
+		justify-content: space-between;
 		align-items: center;
 		position: relative;
 		z-index: 2;
@@ -84,6 +108,24 @@
 	header.proactive-header .lower-header {
 		height: 100%;
 		align-items: flex-end;
+	}
+
+	.left-icon-container {
+		display: flex;
+		align-items: center;
+		z-index: 25;
+	}
+
+	.back-arrow-container {
+		height: 3.5em;
+		width: 3.5em;
+		border-radius: 50%;
+		background-color: white;
+		border: 1px solid black;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		box-sizing: border-box;
 	}
 
 	.icon-container {
@@ -109,7 +151,17 @@
 	}
 
 	.account-icon {
-		width: 2.75em;
-		height: 2.75em;
+		width: 2.75rem;
+		height: 2.75rem;
+	}
+
+	.icon-button {
+		background: none;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 </style>
