@@ -24,7 +24,8 @@
 		right: 0;
 		bottom: 0;
 		background-color: #2e2e2e;
-		background-image: linear-gradient(#3d3d3d 1px, transparent 1px),
+		background-image:
+			linear-gradient(#3d3d3d 1px, transparent 1px),
 			linear-gradient(90deg, #3d3d3d 1px, transparent 1px);
 		background-size: 0.8em 0.8em;
 		overflow-y: auto;
