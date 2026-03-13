@@ -62,5 +62,8 @@
 		{:else}
 			<SignIn />
 		{/if}
+	{:else if message.reply_type === 'application_form'}
+		<!-- Application form UI will be added here -->
+		<div>Application Form Placeholder</div>
 	{/if}
 </ActionsLayout>

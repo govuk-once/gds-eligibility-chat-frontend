@@ -18,6 +18,8 @@ Produces structured output which goes to the elicitation agent. The structured o
   - `choice_multiple`: user can select one or more options from a provided list.
   - `choice_single`: user must select exactly one option from a provided list.
   - `free_text`: user can provide any textual input.
+  - `sign_in`: special type for the sign-in flow.
+  - `application_form`: special type for rendering an application form.
   - `none`: no reply is expected (corresponds to `expects_reply: False`).
 - `choices`: an optional list of strings that provides options for `choice_multiple` or `choice_single` questions.
 
