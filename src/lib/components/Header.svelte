@@ -5,7 +5,7 @@
 
 	let {
 		showIcons = true,
-		isFrameOn = false,
+		isFrameOn = true,
 		showBackground = true
 	} = $props<{
 		showIcons?: boolean;

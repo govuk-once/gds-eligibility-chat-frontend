@@ -5,7 +5,7 @@
 	import { tick } from 'svelte';
 	import ChatInputBox from '$lib/components/chat/ChatInputBox.svelte';
 
-	let frameOn = $state(false);
+	let frameOn = $state(true);
 	function toggleFrame() {
 		frameOn = !frameOn;
 	}

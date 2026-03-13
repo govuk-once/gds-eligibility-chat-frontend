@@ -13,7 +13,7 @@
 	const {
 		footerClass: footerClassProp = '',
 		afterSend: afterSendCallback = null,
-		isFrameOn = false
+		isFrameOn = true
 	} = $props<{
 		footerClass?: string;
 		afterSend?: (input?: ChatInputBox) => void;
