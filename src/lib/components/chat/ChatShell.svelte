@@ -5,47 +5,63 @@
 	import ChatGradient from '$lib/components/chat/ChatGradient.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { chatState, sendMessage } from '$lib/chat.svelte';
+	import { authState } from '$lib/auth-journey.svelte';
 	import ChatInputActions from '$lib/components/chat/ChatInputActions.svelte';
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
-	import { isUserInputVaulted } from '$lib/utils/is-user-input-vaulted';
+	import NotepadOverlay from '$lib/components/notepad/NotepadOverlay.svelte';
+	import ApplicationForm from '$lib/components/notepad/ApplicationForm.svelte';
 
 	const {
 		footerClass: footerClassProp = '',
 		afterSend: afterSendCallback = null,
-		isFrameOn = false
+		isFrameOn = true
 	} = $props<{
 		footerClass?: string;
 		afterSend?: (input?: ChatInputBox) => void;
 		isFrameOn?: boolean;
 	}>();
 
-	const footerClass = $derived(footerClassProp || (isFrameOn ? 'keyboard-collapsed-footer' : ''));
+	const footerClass = $derived(footerClassProp || (isFrameOn ? 'frame-footer' : ''));
+
+	const lastMessage = $derived(chatState.messages.at(-1));
+
+	const isStreaming = $derived(lastMessage?.streaming);
+
+	const messageWithActions = $derived.by(() => {
+		const lastSignInPrompt = [...chatState.messages]
+			.reverse()
+			.find((m) => m.reply_type === 'sign_in');
+		if (authState.showSignInForm || (chatState.loading && lastSignInPrompt)) {
+			return lastSignInPrompt;
+		}
+		return lastMessage;
+	});
+
+	const isSignInFlow = $derived(messageWithActions?.reply_type === 'sign_in');
+	const isFormVisible = $derived(authState.showSignInForm);
 
 	const hasActiveActionsAndNotStreaming = $derived(
-		chatState.activeActions.length > 0 &&
-			chatState.messages.at(-1) &&
-			!chatState.messages.at(-1)?.streaming
+		!!(
+			!chatState.loading &&
+			!isStreaming &&
+			(chatState.activeActions.length > 0 || isSignInFlow || isFormVisible) &&
+			messageWithActions
+		)
 	);
+
+	const GRADIENT_RGB = '245, 245, 245';
+	const GRADIENT_MAX_OPACITY = 0.9;
 
 	let chatWindowEl: HTMLDivElement;
-	let chatInputBoxComponent: ChatInputBox;
+	let chatInputBoxComponent = $state<ChatInputBox>();
 	let thinkingText = $state('Thinking');
 
-	let placeholderText = $derived(
-		chatState.activeActions.length > 0 && hasActiveActionsAndNotStreaming
-			? 'Or something else ...'
-			: ''
-	);
+	let wrapperHeight = $state(0);
+	let footerHeight = $state(0);
+	let gradientHeight = $state(0);
+	let headerHeight = $state(0);
 
-	const isCurrentInputVaulted = $derived(
-		(() => {
-			const lastAssistantMessage = [...chatState.messages]
-				.reverse()
-				.find((m) => m.role === 'assistant');
-
-			return isUserInputVaulted(lastAssistantMessage);
-		})()
-	);
+	let placeholderText = $derived(hasActiveActionsAndNotStreaming ? 'Or something else ...' : '');
 
 	$effect(() => {
 		if (!chatState.loading) return;
@@ -64,6 +80,41 @@
 		};
 	});
 
+	// State to track if at the bottom BEFORE a height change
+	let wasAtBottom = true;
+
+	$effect.pre(() => {
+		// Track dependencies that cause layout shifts
+		void wrapperHeight;
+		void footerHeight;
+		void gradientHeight;
+		void hasActiveActionsAndNotStreaming;
+
+		if (chatWindowEl) {
+			// Capture scroll state before the DOM updates with new heights
+			wasAtBottom =
+				chatWindowEl.scrollHeight - chatWindowEl.scrollTop - chatWindowEl.clientHeight < 50;
+		}
+	});
+
+	// Auto-scroll after heights have applied to the DOM
+	$effect(() => {
+		// Track same dependencies
+		void wrapperHeight;
+		void footerHeight;
+		void gradientHeight;
+		void hasActiveActionsAndNotStreaming;
+
+		if (chatWindowEl && (wasAtBottom || chatState.loading)) {
+			// Use requestAnimationFrame to ensure the browser has processed the layout shift
+			requestAnimationFrame(() => {
+				if (chatWindowEl) {
+					chatWindowEl.scrollTop = chatWindowEl.scrollHeight;
+				}
+			});
+		}
+	});
+
 	async function handleSend() {
 		await sendMessage();
 		afterSendCallback?.(chatInputBoxComponent);
@@ -71,78 +122,110 @@
 
 	function handleStreamUpdate() {
 		requestAnimationFrame(() => {
-			chatWindowEl.scrollTop = chatWindowEl.scrollHeight;
+			if (chatWindowEl) {
+				chatWindowEl.scrollTop = chatWindowEl.scrollHeight;
+			}
 		});
 	}
 </script>
 
-<Header showVault={!chatState.config.isProactive} {isFrameOn} />
-
 <div class="chat-container">
-	<div class="chat-top-spacer"></div>
+	<div class="chat-main-area">
+		<div class="header-layer background">
+			<Header showIcons={false} {isFrameOn} />
+		</div>
 
-	<div
-		class="chat-window"
-		use:autoScroll
-		bind:this={chatWindowEl}
-		class:hide-scrollbar={footerClass === 'keyboard-collapsed-footer'}
-	>
-		{#each chatState.messages as m, i (m.id)}
-			{#if !(chatState.loading && i === chatState.messages.length - 1)}
-				<ChatMessage
-					message={m}
-					isLast={i === chatState.messages.length - 1}
-					loading={chatState.loading}
-					onUpdate={handleStreamUpdate}
-				/>
-			{/if}
-		{/each}
+		<div class="chat-window" use:autoScroll bind:this={chatWindowEl}>
+			<div class="chat-messages-container">
+				<div class="chat-top-spacer" style:height="calc({headerHeight}px + 1em)"></div>
 
-		{#if chatState.loading}
-			<ChatMessage
-				message={{
-					id: 'loading-indicator',
-					role: 'assistant',
-					html: `<p>${thinkingText}</p>`
-				}}
-				isLast
-				loading
-			/>
+				{#each chatState.messages as m, i (m.id)}
+					{#if !(chatState.loading && i === chatState.messages.length - 1 && m.role === 'assistant')}
+						<ChatMessage
+							message={m}
+							isLast={i === chatState.messages.length - 1}
+							loading={chatState.loading}
+							onUpdate={handleStreamUpdate}
+						/>
+					{/if}
+				{/each}
+
+				{#if chatState.loading}
+					<ChatMessage
+						message={{
+							id: 'loading-indicator',
+							role: 'assistant',
+							html: `<p>${thinkingText}</p>`
+						}}
+						isLast
+						loading
+					/>
+				{/if}
+			</div>
+
+			<div
+				class="bottom-spacer"
+				style:height="{wrapperHeight + footerHeight + gradientHeight}px"
+			></div>
+		</div>
+
+		<div class="header-layer icons">
+			<div bind:clientHeight={headerHeight}>
+				<Header showIcons={!chatState.config.isProactive} showBackground={false} {isFrameOn} />
+			</div>
+		</div>
+
+		{#if authState.notepadClicked}
+			<div class="notepad-overlay-layer">
+				<NotepadOverlay {headerHeight} {footerHeight} />
+			</div>
+		{:else if authState.showApplicationFormOverlay}
+			<div class="notepad-overlay-layer">
+				<ApplicationForm {headerHeight} {footerHeight} />
+			</div>
 		{/if}
-		<ChatGradient />
-	</div>
 
-	<div class="chat-wrapper" class:with-border={hasActiveActionsAndNotStreaming}>
-		{#if hasActiveActionsAndNotStreaming}
-			<div class="extra-gap"></div>
-			<div class="extra-gap"></div>
-			{#if isCurrentInputVaulted}
-				<div class="privacy-note-wrapper">
-					<div class="privacy-note">
-						Stored in your private data vault
-						<img src="/icons/shield-check.svg" alt="" aria-hidden="true" class="privacy-icon" />
-					</div>
+		<div class="footer-layer" bind:clientHeight={footerHeight}>
+			<Footer class={footerClass} {isFrameOn} />
+		</div>
+
+		<div class="wrapper-layer" style:bottom="{footerHeight}px" bind:clientHeight={wrapperHeight}>
+			<div
+				class="bottom-background-gradient"
+				style:height="{footerHeight + wrapperHeight}px"
+				style:bottom="-{footerHeight}px"
+				style:background-color="rgba({GRADIENT_RGB}, {GRADIENT_MAX_OPACITY})"
+			></div>
+
+			<div class="gradient-layer-container">
+				<div bind:clientHeight={gradientHeight}>
+					<ChatGradient position="static" rgb={GRADIENT_RGB} maxOpacity={GRADIENT_MAX_OPACITY} />
 				</div>
-			{/if}
-			<ChatInputActions
-				message={chatState.messages.at(-1)!}
-				displayedActions={chatState.activeActions}
-			/>
-			<div class="extra-gap"></div>
-		{/if}
+			</div>
 
-		<ChatInputBox
-			bind:this={chatInputBoxComponent}
-			bind:value={chatState.input}
-			loading={chatState.loading}
-			onSend={handleSend}
-			placeholder={placeholderText}
-			{hasActiveActionsAndNotStreaming}
-		/>
+			<div class="chat-wrapper" class:expanded={hasActiveActionsAndNotStreaming}>
+				{#if hasActiveActionsAndNotStreaming && messageWithActions}
+					<div class="extra-gap"></div>
+					<div class="extra-gap"></div>
+					<ChatInputActions
+						message={messageWithActions}
+						displayedActions={chatState.activeActions}
+					/>
+					<div class="extra-gap"></div>
+				{/if}
+
+				<ChatInputBox
+					bind:this={chatInputBoxComponent}
+					bind:value={chatState.input}
+					loading={chatState.loading}
+					onSend={handleSend}
+					placeholder={placeholderText}
+					{hasActiveActionsAndNotStreaming}
+				/>
+			</div>
+		</div>
 	</div>
 </div>
-
-<Footer class={footerClass} {isFrameOn} />
 
 <style>
 	.chat-container {
@@ -155,8 +238,44 @@
 		min-height: 0;
 	}
 
+	.chat-main-area {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		position: relative;
+		min-height: 0;
+	}
+
+	.header-layer {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		pointer-events: none;
+	}
+
+	.header-layer.background {
+		z-index: 21;
+	}
+
+	.header-layer.icons {
+		z-index: 100;
+	}
+
+	.notepad-overlay-layer {
+		position: absolute;
+		top: 0;
+		left: -1em; /* Cover the 1em padding of app-container */
+		right: -1em;
+		bottom: 0;
+		z-index: 90;
+	}
+
+	.header-layer :global(*) {
+		pointer-events: auto;
+	}
+
 	.chat-top-spacer {
-		height: 1.5em;
 		flex-shrink: 0;
 	}
 
@@ -164,57 +283,81 @@
 		overflow-y: auto;
 		display: flex;
 		flex-direction: column;
-		gap: 1.5em; /* gap between items in chat window */
 		flex: 1; /* Grow to fill available space */
 		min-height: 0; /* Prevent flexbox overflow */
-	}
+		z-index: 20;
 
-	/* Hide scrollbar but allow scrolling */
-	.chat-window.hide-scrollbar {
+		/* Hide scrollbar but allow scrolling */
 		scrollbar-width: none; /* Firefox */
 		-ms-overflow-style: none; /* IE 10+ */
 	}
 
-	.chat-window.hide-scrollbar::-webkit-scrollbar {
+	.chat-window::-webkit-scrollbar {
 		display: none; /* Chrome, Safari, Edge */
+	}
+
+	.chat-messages-container {
+		display: flex;
+		flex-direction: column;
+		position: relative;
+	}
+
+	.chat-messages-container > :global(.message + .message) {
+		margin-top: 1.5em;
 	}
 
 	.extra-gap {
 		height: 0.5em;
 	}
 
+	.bottom-spacer {
+		flex-shrink: 0;
+	}
+
+	.footer-layer {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 10;
+	}
+
+	.wrapper-layer {
+		position: absolute;
+		left: 0;
+		right: 0;
+		z-index: 30;
+	}
+
+	.bottom-background-gradient {
+		position: absolute;
+		left: 0;
+		right: 0;
+		z-index: 3;
+		pointer-events: none;
+	}
+
+	.gradient-layer-container {
+		position: absolute;
+		bottom: 100%;
+		width: 100%;
+		pointer-events: none;
+		z-index: 3;
+	}
+
 	.chat-wrapper {
 		box-sizing: border-box;
-		border: 1px solid transparent;
+		border: 1px solid black;
+		background-color: white;
 		border-radius: 1.5em;
 		overflow: hidden;
 		position: relative;
+		padding-top: 1em;
+		z-index: 4;
 	}
 
-	.chat-wrapper.with-border {
-		padding-top: 0em;
+	.chat-wrapper.expanded {
+		padding-top: 0;
 		padding-bottom: 1em;
-		border-color: black;
-		margin-bottom: 0.5em;
-	}
-
-	.privacy-note-wrapper {
-		padding: 0 1em 0.5em 1em;
-		display: flex;
-		justify-content: flex-end; /* aligns content to the right */
-		align-items: center; /* vertically center the icon/text */
-	}
-
-	.privacy-note {
-		display: flex;
-		align-items: center;
-		font-size: 0.75em;
-		color: #aaaaaa;
-	}
-
-	.privacy-icon {
-		width: 1.25rem;
-		height: 1.25rem;
-		margin-left: 0.8em;
 	}
 </style>

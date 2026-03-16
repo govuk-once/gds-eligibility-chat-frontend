@@ -15,7 +15,6 @@
 </script>
 
 <div class="checklist-component">
-	<div class="heading-text"><b>Please select all that apply:</b></div>
 	<div class="checklist-group">
 		{#each actions as action (action.payload)}
 			<div>
@@ -92,9 +91,5 @@
 
 	.checklist-label input[type='checkbox']:checked + .checklist-custom::after {
 		display: block;
-	}
-
-	.heading-text {
-		padding-bottom: 1em;
 	}
 </style>

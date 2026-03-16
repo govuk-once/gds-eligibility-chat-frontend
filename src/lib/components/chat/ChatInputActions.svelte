@@ -10,7 +10,7 @@
 	}>();
 </script>
 
-{#if displayedActions.length > 0}
+{#if displayedActions.length > 0 || message.reply_type === 'sign_in'}
 	<div class="chat-input-actions">
 		{#if message.source === 'user_agent'}
 			<UserAgentMessageActions {message} {displayedActions} />

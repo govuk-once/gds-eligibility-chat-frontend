@@ -16,7 +16,9 @@ export function autoScroll(node: HTMLElement) {
 			// Using requestAnimationFrame can be smoother for scrolling
 			// as it waits for the next browser repaint.
 			requestAnimationFrame(() => {
-				node.scrollTop = node.scrollHeight;
+				if (node) {
+					node.scrollTop = node.scrollHeight;
+				}
 			});
 		}
 	});

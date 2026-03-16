@@ -2,7 +2,7 @@
 	import { chatState } from '$lib/chat.svelte';
 	import { device } from '$lib/device.svelte';
 
-	let { class: className = '', isFrameOn = false } = $props<{
+	let { class: className = '', isFrameOn = true } = $props<{
 		class?: string;
 		isFrameOn?: boolean;
 	}>();
@@ -32,5 +32,9 @@
 
 	.mobile-footer {
 		height: 0em;
+	}
+
+	.frame-footer {
+		height: 2.75em;
 	}
 </style>

@@ -50,7 +50,9 @@ export const createAdkSession = async (
 ): Promise<void> => {
 	const url = `${baseUrl}/apps/${appName}/users/${userId}/sessions/${sessionId}`;
 	const headers = { 'Content-Type': 'application/json' };
-	const body = statePrompt ? { 'app:state_prompt': statePrompt } : {};
+	const body = statePrompt
+		? { 'app:state_prompt': statePrompt }
+		: { 'session:session_id': sessionId };
 
 	logger.info({ url }, 'Creating ADK Session');
 	logger.info({ body }, 'ADK Session app:state_prompt');

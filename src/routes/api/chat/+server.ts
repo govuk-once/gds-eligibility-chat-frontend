@@ -19,11 +19,11 @@ export const POST: RequestHandler = async ({ request }) => {
 	let appName = env.ADK_APP_NAME;
 
 	if (isChildBenefit) {
-	appName = env.CHILD_BENEFIT_ADK_APP_NAME;
+		appName = env.CHILD_BENEFIT_ADK_APP_NAME;
 	} else if (isProactive) {
-	appName = env.PROACTIVE_ADK_APP_NAME;
+		appName = env.PROACTIVE_ADK_APP_NAME;
 	}
-	
+
 	const userId = env.ADK_USER_ID;
 
 	if (!appName || !userId) {
@@ -70,7 +70,8 @@ export const POST: RequestHandler = async ({ request }) => {
 
 		const responsePayload = {
 			response: agentResponse,
-			isProactiveInitial: isProactive && isFirstMessage
+			isProactiveInitial: isProactive && isFirstMessage,
+			isFirstMessage: isFirstMessage
 		};
 
 		return json(responsePayload);

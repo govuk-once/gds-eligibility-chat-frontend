@@ -1,92 +1,206 @@
 <script lang="ts">
 	import { chatState } from '$lib/chat.svelte';
+	import { authState } from '$lib/auth-journey.svelte';
 	import { device } from '$lib/device.svelte';
 
-	let { showVault = true, isFrameOn = false } = $props<{
-		showVault?: boolean;
+	let {
+		showIcons = true,
+		isFrameOn = true,
+		showBackground = true
+	} = $props<{
+		showIcons?: boolean;
 		isFrameOn?: boolean;
+		showBackground?: boolean;
 	}>();
 
-	const vaultCount = $derived(chatState.messages.filter((m) => m.vault).length);
 	const isProactiveWebNoFrame = $derived(
 		chatState.config.isProactive && !device.isMobile && !isFrameOn
 	);
 </script>
 
-<header class:proactive-header={isProactiveWebNoFrame}>
-	{#if showVault}
-		<div class="vault-container">
-			<div class="shield-container">
-				<img
-					src="/icons/shield-check.svg"
-					alt="vault icon"
-					aria-hidden="true"
-					class="privacy-icon"
-				/>
-			</div>
-			{#if vaultCount > 0}
-				<div class="notification-dot">
-					<span>{vaultCount}</span>
+<header class:proactive-header={isProactiveWebNoFrame} class:with-background={showBackground}>
+	<div class="upper-header"></div>
+	<div class="lower-header">
+		<div class="left-icon-container" style:visibility={showIcons ? 'visible' : 'hidden'}>
+			{#if authState.notepadClicked || authState.showApplicationFormOverlay}
+				<div class="back-arrow-container">
+					<button
+						onclick={() => {
+							authState.notepadClicked = false;
+							authState.showApplicationFormOverlay = false;
+						}}
+						class="icon-button"
+						aria-label={authState.showApplicationFormOverlay ? 'close' : 'go back'}
+					>
+						<img
+							src={authState.showApplicationFormOverlay ? '/icons/close-window.svg' : '/icons/back-arrow.svg'}
+							alt={authState.showApplicationFormOverlay ? 'close' : 'back'}
+							aria-hidden="true"
+							class="account-icon"
+						/>
+					</button>
 				</div>
 			{/if}
 		</div>
-	{/if}
+
+		{#if authState.showApplicationFormOverlay}
+			<div class="title-container">
+				<span class="title">{authState.applicationFormTitle}</span>
+			</div>
+		{/if}
+
+		{#if !authState.showApplicationFormOverlay}
+			<div class="icon-container" style:visibility={showIcons ? 'visible' : 'hidden'}>
+				<div class="account-container">
+					<img
+						src={authState.signedIn
+							? '/icons/account-signed-in.svg'
+							: '/icons/account-not-signed-in.svg'}
+						alt={authState.signedIn ? 'account signed in' : 'account not signed in'}
+						aria-hidden="true"
+						class="account-icon"
+					/>
+					{#if authState.signedIn}
+						<button
+							onclick={() => (authState.notepadClicked = !authState.notepadClicked)}
+							class="icon-button"
+							disabled={authState.notepadClicked}
+						>
+							<img
+								src={authState.notepadClicked ? '/icons/notepad-clicked.svg' : '/icons/notepad.svg'}
+								alt="notepad"
+								aria-hidden="true"
+								class="account-icon"
+							/>
+						</button>
+					{/if}
+				</div>
+			</div>
+		{/if}
+	</div>
 </header>
 
 <style>
 	header {
-		height: 6.625em;
 		display: flex;
-		justify-content: flex-end;
-		align-items: flex-end;
-		padding: 0 0.5em;
-		background-color: #f5f5f5;
+		flex-direction: column;
+		position: relative;
 	}
 
 	header.proactive-header {
 		height: 1em;
 	}
 
-	.vault-container {
+	header.with-background .upper-header {
+		background-color: rgba(245, 245, 245, 0.9);
+	}
+
+	header.with-background .lower-header {
+		background: linear-gradient(
+			to bottom,
+			rgba(245, 245, 245, 0.9) 0%,
+			rgba(245, 245, 245, 0) 100%
+		);
+	}
+
+	.upper-header {
+		height: 3.875em;
 		position: relative;
+		z-index: 2;
+	}
+
+	header.proactive-header .upper-header {
+		display: none;
+	}
+
+	.lower-header {
+		height: 3.5em;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		position: relative;
+		z-index: 2;
+	}
+
+	header.proactive-header .lower-header {
+		height: 100%;
+		align-items: flex-end;
+	}
+
+	.left-icon-container {
 		display: flex;
 		align-items: center;
-		gap: 0.5em;
+		z-index: 25;
 	}
 
-	.privacy-icon {
-		width: 1.4em;
-		height: 1.4em;
+	.title-container {
+		position: absolute;
+		margin-left: 4.5em;
+		margin-right: 4.5em;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		pointer-events: none;
 	}
 
-	.shield-container {
-		width: 2.75em;
-		height: 2.75em;
+	.title {
+		font-size: 1em;
+		font-weight: bold;
+		pointer-events: auto;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		text-align: center;
+	}
+
+	.back-arrow-container {
+		height: 3.5em;
+		width: 3.5em;
 		border-radius: 50%;
 		background-color: white;
 		border: 1px solid black;
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		box-sizing: border-box;
 	}
 
-	.notification-dot {
-		position: absolute;
-		top: 0;
-		right: 0;
-		width: 0.875em;
-		height: 0.875em;
-		background-color: black;
-		border-radius: 50%;
-		color: white;
+	.icon-container {
+		position: relative;
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+		z-index: 25;
+	}
+
+	.account-container {
+		height: 3.5em;
+		min-width: 3.5em;
+		border-radius: 1.75em;
+		background-color: white;
+		border: 1px solid black;
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		box-sizing: border-box;
+		padding: 0 0.375em;
+		gap: 1em;
 	}
 
-	.notification-dot span {
-		font-size: 0.6em;
-		font-weight: bold;
-		font-family: sans-serif;
+	.account-icon {
+		width: 2.75rem;
+		height: 2.75rem;
+	}
+
+	.icon-button {
+		background: none;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 </style>

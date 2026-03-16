@@ -3,7 +3,14 @@ import type { Action } from '$lib/types';
 export type ElicitationResponse = {
 	content: string;
 	source?: 'user_agent' | 'benefit_agent';
-	reply_type?: 'yes_no' | 'choice_multiple' | 'choice_single' | 'free_text' | 'none';
+	reply_type?:
+		| 'yes_no'
+		| 'choice_multiple'
+		| 'choice_single'
+		| 'sign_in'
+		| 'application_form'
+		| 'free_text'
+		| 'none';
 	actions?: Action[];
 };
 
@@ -12,8 +19,9 @@ export function extractFinalModelResponse(
 	isProactive?: boolean
 ): ElicitationResponse {
 	const eventArray = resData.response;
+	const isFirstMessage = resData.isFirstMessage;
 
-	if (isProactive) {
+	if (isProactive || isFirstMessage) {
 		if (Array.isArray(eventArray) && eventArray.length > 0) {
 			const firstTurn = eventArray[0];
 			if (firstTurn.content?.parts?.[0]?.text) {
@@ -25,7 +33,9 @@ export function extractFinalModelResponse(
 				};
 			}
 		}
-	} else {
+	}
+
+	if (!isProactive) {
 		if (!Array.isArray(eventArray))
 			return { content: 'There has been an error. Please try again.' };
 
@@ -59,6 +69,8 @@ export function extractFinalModelResponse(
 						r.reply_type === 'choice_multiple' ||
 						r.reply_type === 'choice_single' ||
 						r.reply_type === 'free_text' ||
+						r.reply_type === 'sign_in' ||
+						r.reply_type === 'application_form' ||
 						r.reply_type === 'none'
 							? r.reply_type
 							: 'none';
