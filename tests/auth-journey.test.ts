@@ -30,7 +30,8 @@ describe('authJourney', () => {
 		it('should start the journey when receiving sign_in for the first time', () => {
 			const { contentToDisplay, finalReplyType } = authJourney.interceptResponse(
 				'sign_in',
-				'Initial prompt'
+				'Initial prompt',
+				'test-id'
 			);
 
 			expect(authState.inSignInJourney).toBe(true);
@@ -45,7 +46,8 @@ describe('authJourney', () => {
 
 			const { contentToDisplay, finalReplyType } = authJourney.interceptResponse(
 				'sign_in',
-				'Re-prompt content'
+				'Re-prompt content',
+				'test-id'
 			);
 
 			expect(authState.showSignInForm).toBe(true);
@@ -56,20 +58,21 @@ describe('authJourney', () => {
 		it('should handle application_form and set title', () => {
 			const { contentToDisplay, finalReplyType } = authJourney.interceptResponse(
 				'application_form',
-				'Test Application Title'
+				'Test Application Title',
+				'test-id'
 			);
 
 			expect(authState.showApplicationFormOverlay).toBe(true);
 			expect(authState.applicationFormTitle).toBe('Test Application Title');
 			expect(authState.inSignInJourney).toBe(false);
-			expect(contentToDisplay).toBe('Test Application Title');
+			expect(contentToDisplay).toBe('Test Application Title application form');
 			expect(finalReplyType).toBe('application_form');
 		});
 
 		it('should exit journey if response is not sign_in', () => {
 			authState.inSignInJourney = true;
 
-			authJourney.interceptResponse('free_text', 'Some other message');
+			authJourney.interceptResponse('free_text', 'Some other message', 'test-id');
 
 			expect(authState.inSignInJourney).toBe(false);
 		});
