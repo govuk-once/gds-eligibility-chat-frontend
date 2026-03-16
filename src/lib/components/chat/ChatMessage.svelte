@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Message } from '$lib/types';
 	import StreamingText from '$lib/components/chat/StreamingText.svelte';
+	import { authState } from '$lib/auth-journey.svelte';
 
 	let { message, isLast, loading, onUpdate } = $props<{
 		message: Message;
@@ -8,11 +9,31 @@
 		loading: boolean;
 		onUpdate?: () => void;
 	}>();
+
+	function openOverlay(e: MouseEvent) {
+		e.preventDefault();
+		authState.activeApplicationFormId = message.id;
+		authState.applicationFormTitle = (message.markdown || message.text || '').replace(
+			' application form',
+			''
+		);
+		authState.showApplicationFormOverlay = true;
+	}
 </script>
 
 <div class="message {message.role}">
 	<div class="message-content">
-		{#if message.role === 'assistant' && isLast && !loading && message.markdown}
+		{#if message.reply_type === 'application_form'}
+			{#if message.form_submitted}
+				<p>{message.markdown || message.text}</p>
+			{:else}
+				<p>
+					<button class="link-button" onclick={openOverlay}
+						>{message.markdown || message.text}</button
+					>
+				</p>
+			{/if}
+		{:else if message.role === 'assistant' && isLast && !loading && message.markdown}
 			<StreamingText messageId={message.id} content={message.markdown} stream={true} {onUpdate} />
 		{:else if message.html}
 			{@html message.html}
@@ -23,8 +44,17 @@
 </div>
 
 <style>
-	:global(.message a) {
+	:global(.message a),
+	.link-button {
 		color: black;
+		background: none;
+		border: none;
+		padding: 0;
+		font: inherit;
+		text-align: left;
+		text-decoration: underline;
+		cursor: pointer;
+		display: inline;
 	}
 
 	:global(.message p) {

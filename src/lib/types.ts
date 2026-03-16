@@ -28,6 +28,8 @@ export type Message = {
 	actions?: Action[];
 
 	streaming?: boolean;
+
+	form_submitted?: boolean;
 };
 
 export interface ChatSessionConfig {

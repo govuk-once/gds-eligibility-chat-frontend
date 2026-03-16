@@ -9,6 +9,7 @@
 	import ChatInputActions from '$lib/components/chat/ChatInputActions.svelte';
 	import { autoScroll } from '$lib/utils/autoScroll.svelte';
 	import NotepadOverlay from '$lib/components/notepad/NotepadOverlay.svelte';
+	import ApplicationForm from '$lib/components/notepad/ApplicationForm.svelte';
 
 	const {
 		footerClass: footerClassProp = '',
@@ -177,6 +178,10 @@
 		{#if authState.notepadClicked}
 			<div class="notepad-overlay-layer">
 				<NotepadOverlay {headerHeight} {footerHeight} />
+			</div>
+		{:else if authState.showApplicationFormOverlay}
+			<div class="notepad-overlay-layer">
+				<ApplicationForm {headerHeight} {footerHeight} />
 			</div>
 		{/if}
 

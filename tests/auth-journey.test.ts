@@ -53,6 +53,19 @@ describe('authJourney', () => {
 			expect(finalReplyType).toBe('sign_in');
 		});
 
+		it('should handle application_form and set title', () => {
+			const { contentToDisplay, finalReplyType } = authJourney.interceptResponse(
+				'application_form',
+				'Test Application Title'
+			);
+
+			expect(authState.showApplicationFormOverlay).toBe(true);
+			expect(authState.applicationFormTitle).toBe('Test Application Title');
+			expect(authState.inSignInJourney).toBe(false);
+			expect(contentToDisplay).toBe('Test Application Title');
+			expect(finalReplyType).toBe('application_form');
+		});
+
 		it('should exit journey if response is not sign_in', () => {
 			authState.inSignInJourney = true;
 
@@ -94,6 +107,8 @@ describe('authJourney', () => {
 			authState.showSignInForm = true;
 			authState.signedIn = true;
 			authState.notepadClicked = true;
+			authState.showApplicationFormOverlay = true;
+			authState.applicationFormTitle = 'Some Title';
 
 			resetAuthState();
 
@@ -101,6 +116,8 @@ describe('authJourney', () => {
 			expect(authState.showSignInForm).toBe(false);
 			expect(authState.signedIn).toBe(false);
 			expect(authState.notepadClicked).toBe(false);
+			expect(authState.showApplicationFormOverlay).toBe(false);
+			expect(authState.applicationFormTitle).toBe('');
 		});
 	});
 

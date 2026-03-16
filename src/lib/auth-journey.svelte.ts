@@ -5,7 +5,10 @@ export const authState = $state({
 	inSignInJourney: false,
 	showSignInForm: false,
 	signedIn: false,
-	notepadClicked: false
+	notepadClicked: false,
+	showApplicationFormOverlay: false,
+	applicationFormTitle: '',
+	activeApplicationFormId: ''
 });
 
 export function resetAuthState() {
@@ -13,6 +16,9 @@ export function resetAuthState() {
 	authState.showSignInForm = false;
 	authState.signedIn = false;
 	authState.notepadClicked = false;
+	authState.showApplicationFormOverlay = false;
+	authState.applicationFormTitle = '';
+	authState.activeApplicationFormId = '';
 }
 
 export const authJourney = {
@@ -20,7 +26,7 @@ export const authJourney = {
 	 * Intercepts response from agent to handle sign-in journey logic.
 	 * Returns (potentially modified) content and reply type.
 	 */
-	interceptResponse(replyType: Message['reply_type'], content: string) {
+	interceptResponse(replyType: Message['reply_type'], content: string, messageId: string) {
 		let contentToDisplay = content;
 		let finalReplyType: Message['reply_type'] = replyType || 'free_text';
 
@@ -33,6 +39,12 @@ export const authJourney = {
 				// First time seeing prompt
 				authState.inSignInJourney = true;
 			}
+		} else if (finalReplyType === 'application_form') {
+			contentToDisplay = `${content} application form`;
+			authState.showApplicationFormOverlay = true;
+			authState.applicationFormTitle = content;
+			authState.activeApplicationFormId = messageId;
+			authState.inSignInJourney = false;
 		} else {
 			// Any other response exits the journey
 			authState.inSignInJourney = false;
@@ -40,6 +52,7 @@ export const authJourney = {
 
 		return { contentToDisplay, finalReplyType };
 	},
+
 
 	/**
 	 * Handles transition from the "Yes" selection to showing the sign-in form.

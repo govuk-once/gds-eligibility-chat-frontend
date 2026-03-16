@@ -22,44 +22,61 @@
 	<div class="upper-header"></div>
 	<div class="lower-header">
 		<div class="left-icon-container" style:visibility={showIcons ? 'visible' : 'hidden'}>
-			{#if authState.notepadClicked}
+			{#if authState.notepadClicked || authState.showApplicationFormOverlay}
 				<div class="back-arrow-container">
 					<button
-						onclick={() => (authState.notepadClicked = false)}
+						onclick={() => {
+							authState.notepadClicked = false;
+							authState.showApplicationFormOverlay = false;
+						}}
 						class="icon-button"
-						aria-label="go back"
-					>
-						<img src="/icons/back-arrow.svg" alt="back" aria-hidden="true" class="account-icon" />
-					</button>
-				</div>
-			{/if}
-		</div>
-		<div class="icon-container" style:visibility={showIcons ? 'visible' : 'hidden'}>
-			<div class="account-container">
-				<img
-					src={authState.signedIn
-						? '/icons/account-signed-in.svg'
-						: '/icons/account-not-signed-in.svg'}
-					alt={authState.signedIn ? 'account signed in' : 'account not signed in'}
-					aria-hidden="true"
-					class="account-icon"
-				/>
-				{#if authState.signedIn}
-					<button
-						onclick={() => (authState.notepadClicked = !authState.notepadClicked)}
-						class="icon-button"
-						disabled={authState.notepadClicked}
+						aria-label={authState.showApplicationFormOverlay ? 'close' : 'go back'}
 					>
 						<img
-							src={authState.notepadClicked ? '/icons/notepad-clicked.svg' : '/icons/notepad.svg'}
-							alt="notepad"
+							src={authState.showApplicationFormOverlay ? '/icons/close-window.svg' : '/icons/back-arrow.svg'}
+							alt={authState.showApplicationFormOverlay ? 'close' : 'back'}
 							aria-hidden="true"
 							class="account-icon"
 						/>
 					</button>
-				{/if}
-			</div>
+				</div>
+			{/if}
 		</div>
+
+		{#if authState.showApplicationFormOverlay}
+			<div class="title-container">
+				<span class="title">{authState.applicationFormTitle}</span>
+			</div>
+		{/if}
+
+		{#if !authState.showApplicationFormOverlay}
+			<div class="icon-container" style:visibility={showIcons ? 'visible' : 'hidden'}>
+				<div class="account-container">
+					<img
+						src={authState.signedIn
+							? '/icons/account-signed-in.svg'
+							: '/icons/account-not-signed-in.svg'}
+						alt={authState.signedIn ? 'account signed in' : 'account not signed in'}
+						aria-hidden="true"
+						class="account-icon"
+					/>
+					{#if authState.signedIn}
+						<button
+							onclick={() => (authState.notepadClicked = !authState.notepadClicked)}
+							class="icon-button"
+							disabled={authState.notepadClicked}
+						>
+							<img
+								src={authState.notepadClicked ? '/icons/notepad-clicked.svg' : '/icons/notepad.svg'}
+								alt="notepad"
+								aria-hidden="true"
+								class="account-icon"
+							/>
+						</button>
+					{/if}
+				</div>
+			</div>
+		{/if}
 	</div>
 </header>
 
@@ -114,6 +131,28 @@
 		display: flex;
 		align-items: center;
 		z-index: 25;
+	}
+
+	.title-container {
+		position: absolute;
+		margin-left: 4.5em;
+		margin-right: 4.5em;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		pointer-events: none;
+	}
+
+	.title {
+		font-size: 1em;
+		font-weight: bold;
+		pointer-events: auto;
+		font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+		text-align: center;
 	}
 
 	.back-arrow-container {

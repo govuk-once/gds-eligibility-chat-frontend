@@ -101,17 +101,24 @@ export async function postMessageAndHandleResponse(message: string, isFirstMessa
 		// Delegate sign-in logic to authJourney
 		const { contentToDisplay, finalReplyType } = authJourney.interceptResponse(
 			reply_type || 'free_text',
-			finalResponse.content
+			finalResponse.content,
+			assistantMessageId
 		);
 
-		const safeHtml = await markdownToHtml(contentToDisplay);
+		let safeHtml = '';
+		if (finalReplyType !== 'application_form') {
+			safeHtml = await markdownToHtml(contentToDisplay);
+		}
 
 		const assistantMessage = chatState.messages.find((m) => m.id === assistantMessageId);
 		if (assistantMessage) {
 			assistantMessage.markdown = contentToDisplay;
 			assistantMessage.source = source || 'user_agent';
 			assistantMessage.reply_type = finalReplyType;
-			if (safeHtml) {
+			if (finalReplyType === 'application_form') {
+				assistantMessage.streaming = false;
+			}
+			if (safeHtml || finalReplyType === 'application_form') {
 				assistantMessage.html = safeHtml;
 			} else {
 				assistantMessage.html = 'Received a non-text response from the agent.';
