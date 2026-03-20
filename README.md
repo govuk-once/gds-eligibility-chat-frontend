@@ -1,57 +1,69 @@
-# Simple chat app using Sveltekit (for user research)
+# Eligibility Chat Frontend
 
-## Get started (local development):
+A SvelteKit-based frontend for various eligibility prototypes, designed for user research and testing.
 
+## Getting Started (Local Development)
+
+### 1. Prerequisites
+- Node.js
+- `pnpm`
+
+### 2. Environment Setup
+Copy the example environment file and configure it:
+
+```bash
+cp .env.example .env
 ```
+
+Edit `.env` and set the `PUBLIC_ADK_API_URL`. This should point to a running instance of the ADK API from https://github.com/govuk-once/gds-eligibility-agentic-backend.
+
+### 3. Install Dependencies & Start
+```bash
 pnpm install
-pnpm run dev
+pnpm dev
 ```
+The application will be available at `http://localhost:5173`.
 
-Then visit `http://localhost:5173/`
+---
 
-## Running with Docker Compose
+## Prototypes & Agent Access
 
-This project is configured to run in a Docker container using Docker Compose.
+This frontend hosts multiple prototypes. You can access them via the following URLs:
 
-### Prerequisites
+### 1. Child Benefit Agent
+A dedicated agent for Child Benefit eligibility and information. Tested in user research round 1.
+- **URL:** `http://localhost:5173/child-benefit`
 
-- Docker
-- Docker Compose
+### 2. UC / PIP Agents (Default Home)
+Updated version of the prototype tested in user research round 2.
+- **URL:** `http://localhost:5173/`
 
-### Usage
 
-1.  **Build and Start the Service:**
-    This command will build the Docker image (if it doesn't exist or if you explicitly request a rebuild) and start the application container.
+### 3. Proactive Prototypes
+Tested in user research round 3, these prototypes simulate proactive benefit engagement for different life stages:
+- **Thirties:** `http://localhost:5173/proactive/thirties`
+- **Fifties:** `http://localhost:5173/proactive/fifties`
+- **Over 66:** `http://localhost:5173/proactive/over66`
 
-    ```bash
-    docker-compose up
-    ```
+#### 🔄 Resetting Proactive Journeys
+To clear your session and start a fresh journey (essential when switching between age groups or restarting a user journey), use the `/reset` path:
+- **Example:** `http://localhost:5173/proactive/thirties/reset`
 
-    To force a rebuild of the application image (e.g., after changing source code or `Dockerfile`), use:
+---
 
-    ```bash
-    docker-compose up --build
-    ```
+## Infrastructure & Deployment
 
-    You can add the `-d` flag to run the container in detached mode (in the background):
+The infrastructure code (Terraform/AWS) is located in the **backend repository** (https://github.com/govuk-once/gds-eligibility-agentic-backend).
 
-    ```bash
-    docker-compose up -d
-    ```
+### Updating the Frontend Image
+Once the infrastructure is deployed, you can update the frontend by pushing a new Docker image to Amazon ECR.
 
-    or for a rebuild in detached mode:
+#### Deployment Commands
 
-    ```bash
-    docker-compose up --build -d
-    ```
+```bash
+# 1. Authenticate Docker to ECR
+aws-vault exec <AWS PROFILE> -- aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin <AWS_ACCOUNT_ID>.dkr.ecr.eu-west-2.amazonaws.com
 
-    The application will be available at `http://localhost:3000`.
-
-2.  **Stop the Service:**
-    To stop the running container(s):
-
-    ```bash
-    docker-compose down
-    ```
-
-    This command stops and removes the containers defined in the `docker-compose.yml` file.
+# 2. Push to ECR (ensure correct account - staging or dev - is uncommented in docker-compose.yml)
+docker compose build --push app
+```
